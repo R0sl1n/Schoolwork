@@ -1,3 +1,5 @@
+This project was done together with a fellow student Silje M. Jørgensen.
+
 Brukernavn/passord:
 admin/test
 
