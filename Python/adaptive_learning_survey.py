@@ -1,6 +1,6 @@
 """
 School assignment where we were collecting data from over 100 teatcher regarding the use of adaptive learning tools in math education in middleschool.
-Written by Lill-Kristin Karlsen i okt/nov 2023.
+Written by Lill-Kristin Karlsen i Oct/Nov 2023.
 """
 import pandas as pd
 import seaborn as sns
