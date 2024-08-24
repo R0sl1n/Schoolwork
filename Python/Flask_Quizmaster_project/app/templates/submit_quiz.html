@@ -1,0 +1,44 @@
+{% extends 'layout_users.html' %}
+{% block content %}
+    <h1>Submit Quiz</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Question ID</th>
+                <th>Question Definition</th>
+                <th>User Answer</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in result %}
+                <tr>
+                    <td>{{ row[0].id }}</td>
+                    <td>{{ row[0].definition }}</td>
+                    <td>{{ row[1] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    {% if response_count + 1 == question_count %}
+        <form action="{{ url_for('review') }}" method="GET">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-primary">Review Quiz</button>
+        </form>
+    {% else %}
+        <form action="{{ url_for('submitQuiz') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-primary">Next Question</button>
+        </form>
+    {% endif %}
+    
+{% endblock %}
+

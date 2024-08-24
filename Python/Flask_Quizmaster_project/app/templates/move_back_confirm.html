@@ -1,0 +1,13 @@
+{% extends 'layout_admin.html' %}
+
+{% block content %}
+    <h1>Confirm Move Back</h1>
+    {% if question %}
+        <h3>Confirm move back of: "{{ question.definition }}"</h3>
+        <form method="post" action="/recoverQuestion">
+            <button type="submit" class="btn btn-primary">Move Back</button>
+            <input type="hidden" name="id" value="{{ question.id }}" />
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        </form>
+    {% endif %}
+{% endblock %}

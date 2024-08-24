@@ -1,0 +1,48 @@
+{% extends 'layout_admin.html' %}
+
+{% block content %}
+<h1>Quiz - User overview</h1>
+<br>
+<table>
+    <thead>
+        <th>User ID</th>
+        
+    </thead>
+    <tbody>
+        {% for user in quiz_responses_users %}
+            
+        <tr>
+            <td>User {{ user.id }}</td>
+
+            <td>
+              <form method="get" action="/answerCheck">
+                <p>
+                  <button type="submit" class="btn btn-primary">Check answers</button>
+                </p>
+                <input type="hidden" id="id" name="id" value="{{ user.id }}" />
+                <input type="hidden" id="id_qst" name="id_qst" value="{{ 1 }}" />
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              </form>
+            </td>
+            
+            <td>
+              <form method="post" action="/approveQst">
+                <p><button type="submit" class="btn btn-primary">Approve all questions</button></p>
+                <input type="hidden" name="id" id="id" value="{{ user.id }}" />
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              </form>
+            </td>
+           
+
+            <td>
+              <form method="get" action="/deleteAllAnswersConfirm">
+                <p><button type="submit" class="btn btn-primary">Delete all answers in this quiz</button></p>
+                <input type="hidden" name="id" id="id" value="{{ user.id }}" />
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              </form>
+            </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

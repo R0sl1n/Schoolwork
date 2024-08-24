@@ -1,0 +1,32 @@
+{% extends 'layout_admin.html' %}
+
+{% block content %}
+  <h2>Quiz administrator site.</h2>
+  <br>
+  <p>You are logged in as {{ current_user }}. <i class="fas fa-user"></i></p>
+
+  <h2>What do you want to do?</h2>
+  <br><br>
+  <form action="/quizEdit" method="get">
+    <button type="submit" class="btn btn-primary">Edit Quiz</button>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  </form>
+  <br>
+  <form action="/quiz_users" method="get">
+    <button type="submit" class="btn btn-primary"> Quiz results</button>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  </form>
+  <br>
+  <form action="/start" method="POST">
+    <button type="submit" class="btn btn-primary">Answer Quiz</button>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  </form>
+  <br>
+  <br>
+{% endblock %}
+
+
+
+
+
+

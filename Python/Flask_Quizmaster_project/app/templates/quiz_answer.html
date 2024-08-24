@@ -1,0 +1,87 @@
+{% extends 'layout_users.html' %}
+
+{% block body %}
+
+  <div class="container">
+    {% if current_question %}
+    <form method="post" action="/handle_answer">
+      <input type="hidden" name="answer" value="{{ current_question.id }}">
+      <h1>Question: {{ current_question.definition }}</h1>
+      <br>
+      {% if current_question.type_id == 2 %}
+      <div class="form-group">
+        <label for="answer">Alternatives:</label><br>
+                        
+        <input id="alt1" name="answer" type="checkbox" value="{{ current_question.alt1 }}" >{{ current_question.alt1 }}<br>
+        <input id="alt2" name="answer" type="checkbox" value="{{ current_question.alt2 }}" >{{ current_question.alt2 }}<br>
+        
+        {% if current_question.alt3 %}
+        <input id="alt3" name="answer" type="checkbox" value="{{ current_question.alt3 }}" >{{ current_question.alt3 }}<br>
+        {% endif %}
+        {% if current_question.alt4 %}
+        <input id="alt4" name="answer" type="checkbox" value="{{ current_question.alt4 }}" >{{ current_question.alt4 }}<br>
+        {% endif %}
+        {% if current_question.alt5 %}
+        <input id="alt5" name="answer" type="checkbox" value="{{ current_question.alt5 }}" >{{ current_question.alt5 }}<br>
+        {% endif %}
+        {% if current_question.alt6 %}
+        <input id="alt6" name="answer" type="checkbox" value="{{ current_question.alt6 }}" >{{ current_question.alt6 }}<br>
+        {% endif %}
+      </div>
+
+      {% elif current_question.type_id == 3 %}
+      <div class="form-group">
+        <label for="answer">Alternatives:</label><br>
+          
+        <input id="answer" name="answer" type="radio" value="{{ current_question.alt1 }}" >{{ current_question.alt1 }}<br>
+        <input id="answer" name="answer" type="radio" value="{{ current_question.alt2 }}" >{{ current_question.alt2 }}<br>
+          
+        {% if current_question.alt3 %}
+        <input id="answer" name="answer" type="radio" value="{{ current_question.alt3 }}" >{{ current_question.alt3 }}<br>
+        {% endif %}
+        {% if current_question.alt4 %}
+        <input id="answer" name="answer" type="radio" value="{{ current_question.alt4 }}" >{{ current_question.alt4 }}<br>
+        {% endif %}
+        {% if current_question.alt5 %}
+        <input id="answer" name="answer" type="radio" value="{{ current_question.alt5 }}" >{{ current_question.alt5 }}<br>
+        {% endif %}
+        {% if current_question.alt6 %}
+        <input id="answer" name="answer" type="radio" value="{{ current_question.alt6 }}" >{{ current_question.alt6 }}<br>
+        {% endif %}
+      </div>
+      
+      {% elif current_question.type_id == 1 %}
+      <div class="container">
+        
+        <br> 
+       
+          <div>
+            Answer: {{ current_question.definition_qst }}
+          </div>
+          <div>
+            
+            <input id="answer" name="answer" type="text" value=" " />
+          </div>
+       
+      </div> 
+
+      
+      {% endif %}
+      <br>
+
+      <p><button type="submit" class="btn btn-primary">Neste</button></p>
+      <input type="hidden" name="id_qst" id="id_qst" value="{{current_question.id}}" />
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    </form>
+    
+    {% else %}
+    
+    <h1>All questions answered. Quiz complete!</h1>
+    <br>
+    <a href="{{ url_for('review') }}" class="btn btn-primary">Review Quiz</a>
+    
+    
+    {% endif %}
+    
+  </div>
+{% endblock %}

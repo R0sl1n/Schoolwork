@@ -1,0 +1,34 @@
+{% extends 'layout_admin.html' %}
+
+{% block content %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-info">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    {% if response and question %}
+        <h3>Confirm deleting answer connected to question:</h3> "{{ question.definition }}" <br><br>
+        <h3>Answer submitted: </h3>"{{ response.quiz_answer }}"
+        <form method="post" action="/deleteOneResponse">
+            <p><button type="submit" class="btn btn-primary">Delete response</button></p>
+            <input type="hidden" name="id" value="{{ response.id_user }}" />
+            <input type="hidden" name="id_qst" value="{{ response.id_qst }}" />
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        </form>
+        <form method="post" action="/answerCheck?id_qst={{response.id_qst}}&id_={{response.id_user}}">
+            <p><button type="submit" class="btn btn-primary">Cancel</button></p>
+            <input type="hidden" name="id" value="{{ response.id_user }}" />
+            <input type="hidden" name="id_qst" value="{{ response.id_qst }}" />
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        </form>
+    {% else %}
+        <div class="alert alert-danger" role="alert">
+            Something went wrong...
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends 'layout_admin.html' %}
+
+{% block content %}
+  <h2>Quiz Questions</h2>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Question</th>
+        <th>Options</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for question in questions %}
+        <tr>
+          <td>{{ question.definition }}</td>
+          <td>
+            <ul>
+              {% for option in question.options %}
+                <li>{{ option }}</li>
+              {% endfor %}
+            </ul>
+          </td>
+          <td>
+            <a href="{{ url_for('updateQst', question_id=question.id) }}" class="btn btn-primary">Edit</a>
+          </td>
+          <td>
+            <form method="post" action="{{ url_for('delete_qst_confirm') }}">
+              <input type="hidden" name="id" value="{{ question.id }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-primary">Delete</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if selected_question %}
+    <div>
+      <h3>Editing Question: {{ selected_question.definition }}</h3>
+      <form method="post" action="{{ url_for('updateQst', question_id=selected_question.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+          <label for="definition" class="form-label">Question:</label>
+          <textarea class="form-control" id="definition" name="definition" rows="3">{{ selected_question.definition }}</textarea>
+        </div>
+        <div class="mb-3">
+          <label for="alt1" class="form-label">Option 1:</label>
+          <input type="text" class="form-control" id="alt1" name="alt1" value="{{ selected_question.alt1 }}">
+        </div>
+        <div class="mb-3">
+          <label for="alt2" class="form-label">Option 2:</label>
+          <input type="text" class="form-control" id="alt2" name="alt2" value="{{ selected_question.alt2 }}">
+        </div>
+        <div class="mb-3">
+          <label for="alt3" class="form-label">Option 3:</label>
+          <input type="text" class="form-control" id="alt3" name="alt3" value="{{ selected_question.alt3 }}">
+        </div>
+        <div class="mb-3">
+          <label for="alt4" class="form-label">Option 4:</label>
+          <input type="text" class="form-control" id="alt4" name="alt4" value="{{ selected_question.alt4 }}">
+        </div>
+        <div class="mb-3">
+          <label for="alt5" class="form-label">Option 5:</label>
+          <input type="text" class="form-control" id="alt5" name="alt5" value="{{ selected_question.alt5 }}">
+        </div>
+        <div class="mb-3">
+          <label for="type_id" class="form-label">Type ID:</label>
+          <select class="form-control" id="type_id" name="type_id" required>
+            {% for type in types %}
+              <option value="{{ type.id }}" {% if type.id == selected_question.type.id %}selected{% endif %}>{{ type.category }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="category_id" class="form-label">Category ID:</label>
+          <select class="form-control" id="category_id" name="category_id" required>
+            {% for category in categories %}
+              <option value="{{ category.id }}" {% if category.id == selected_question.category.id %}selected{% endif %}>{{ category.definition }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </form>
+    </div>
+  {% else %}
+    <div>
+      <h3>Add Question</h3>
+      <form method="post" action="{{ url_for('addQuestion') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="mb-3">
+          <label for="definition" class="form-label">Question:</label>
+          <textarea class="form-control" id="definition" name="definition" rows="3"></textarea>
+        </div>
+        <div class="mb-3">
+          <label for="alt1" class="form-label">Option 1:</label>
+          <input type="text" class="form-control" id="alt1" name="alt1">
+        </div>
+        <div class="mb-3">
+          <label for="alt2" class="form-label">Option 2:</label>
+          <input type="text" class="form-control" id="alt2" name="alt2">
+        </div>
+        <div class="mb-3">
+          <label for="alt3" class="form-label">Option 3:</label>
+          <input type="text" class="form-control" id="alt3" name="alt3">
+        </div>
+        <div class="mb-3">
+          <label for="alt4" class="form-label">Option 4:</label>
+          <input type="text" class="form-control" id="alt4" name="alt4">
+        </div>
+        <div class="mb-3">
+          <label for="alt5" class="form-label">Option 5:</label>
+          <input type="text" class="form-control" id="alt5" name="alt5">
+        </div>
+        <div class="mb-3">
+          <label for="type_id" class="form-label">Type ID:</label>
+          <select class="form-control" id="type_id" name="type_id" required>
+            {% for type in types %}
+              <option value="{{ type.id }}">{{ type.category }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="category_id" class="form-label">Category ID:</label>
+          <select class="form-control" id="category_id" name="category_id" required>
+            {% for category in categories %}
+              <option value="{{ category.id }}">{{ category.definition }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Add</button>
+      </form>
+    </div>
+  {% endif %}
+
+{% endblock %}

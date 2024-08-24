@@ -1,0 +1,32 @@
+{% extends 'layout_users.html' %}
+
+{% block content %}
+  <h1>Approved Quizzes</h1>
+  <ul>
+    {% set usernames = [] %}  
+    {% for response in approved_responses %}
+      {% if response.user.username not in usernames %}  
+        {% set _ = usernames.append(response.user.username) %} 
+        <li>
+          <a href="{{ url_for('quiz_details', user_id=response.user.id) }}">{{ response.user.username }}</a>
+          <table>
+       
+            <tbody>
+              {% for user_response in response.user_responses %}
+                <tr>
+                  <td>{{ user_response.question.definition }}</td>
+                  <td>{{ user_response.quiz_answer }}</td>
+                  <td>{{ user_response.quiz_comment }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+  <br>
+  <div class="back-button">
+    <a href="{{ url_for('home') }}" class="btn btn-primary">Back</a>
+  </div>
+{% endblock %}

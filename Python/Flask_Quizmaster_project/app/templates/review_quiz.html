@@ -1,0 +1,55 @@
+{% extends 'layout_users.html' %}
+
+{% block content %}
+  <div class="container">
+    <h1>Quiz Review</h1>
+    <table class="table">
+      <thead>
+        <tr>
+          <td style="padding: 10px;">Question</td>
+          <td style="padding: 10px;">Answer</td>
+          <td style="padding: 10px;">Status</td>
+        <td style="padding: 10px;">Comment</td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for answered_question in answered_questions %}
+          <tr>
+            <td style="padding: 10px;">{{ answered_question.question.definition }}</td>
+            <td style="padding: 10px;">{{ answered_question.quiz_answer }}</td>
+            <td style="padding: 10px;"> 
+            {% if answered_question.quiz_status == 1 %}
+            Not approved
+            {% elif answered_question.quiz_status ==2 %}
+            Approved
+            {% else %}
+            Not reviewed
+            {% endif %}
+          </td>
+          <td style="padding: 10px;"> {% if answered_question.quiz_comment != None %}
+          {{ answered_question.quiz_comment }}
+          {% else %} 
+
+          {% endif %}
+        </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <br>
+    <div class="text-center">
+      <a href="{{ url_for('quizView') }}" class="btn btn-primary" style="background-color: #81131e; color: white;">Take Quiz Again</a>
+      <a href="{{ url_for('submitQuiz') }}" class="btn btn-primary" style="background-color: #81131e; color: white;">Submit Quiz</a>
+    </div>
+  </div>
+  {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul>
+              {% for message in messages %}
+                <li>{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'layout_admin.html' %}
+
+{% block content %}
+    <h3>Confirm deletion of: "{{ question.definition }}"</h3>
+
+    <div class="form-group">
+        <div class="d-flex">
+            <a href="/quizEdit"><button style="background-color: #81131e; color: white; margin-right: 5px;" class="btn">Abort</button></a>
+            <form method="post" action="/delete_qst">
+                <button style="background-color: #81131e; color: white;" type="submit" class="btn">Delete</button>
+                <input type="hidden" name="id" value="{{ question.id }}" />
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            </form>
+        </div>
+    </div>
+{% endblock %}

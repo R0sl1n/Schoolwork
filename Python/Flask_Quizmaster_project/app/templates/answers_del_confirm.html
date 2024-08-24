@@ -1,0 +1,30 @@
+{% extends 'layout_admin.html' %}
+
+{% block content %}
+
+{% if id %}
+    <h3>Confirm deletion of all answers belonging to the following userID: "{{ id }} "</h3>
+    <form method="post" action="/allAnswersDelete">
+		<p><button  type="submit" class="btn btn-primary">Delete</button></p>
+        <input type="hidden" name="id" value="{{ id }}" />
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    </form>
+    <br>
+    <form action="/quiz_users" method="get">
+      <button type="submit" class="btn btn-primary">Back </button>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    </form>
+    <br>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-info">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+{% else %}
+Something went wrong...
+{% endif %}
+{% endblock %}

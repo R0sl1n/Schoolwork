@@ -1,0 +1,30 @@
+{% extends 'layout_users.html' %}
+
+{% block content %}
+  <h1>Quiz Details</h1>
+  {% if selected_user %}
+    <h2>User: {{ selected_user.username }}</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Question</th>
+          <th>Answer</th>
+          <th>Comment</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for response in selected_user_responses %}
+          <tr>
+            <td>{{ response.question.definition }}</td>
+            <td>{{ response.quiz_answer }}</td>
+            <td>{{ response.quiz_comment }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <br>
+    <p><a href="{{ url_for('approved_quizzes') }}" class="btn btn-primary">Back</a></p>
+  {% else %}
+    <p>No user selected.</p>
+  {% endif %}
+{% endblock %}

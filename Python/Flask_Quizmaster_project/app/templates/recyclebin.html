@@ -1,0 +1,31 @@
+{% extends 'layout_admin.html' %}
+
+{% block content %}
+    <h1>Recycle Bin</h1>
+    {% if recyclebin %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Question</th>
+                    <th>Category</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for question in recyclebin %}
+                    <tr>
+                        <td>{{ question.definition }}</td>
+                        <td>{{ question.category_id }}</td>
+                        <td><a href="/moveBackConfirm?id={{ question.id }}">Restore</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No questions in the recycle bin.</p>
+    {% endif %}
+<br>
+<br>
+<br>
+    <a href="{{ url_for('quizEdit') }}" class="btn btn-primary">Back</a>
+{% endblock %}
