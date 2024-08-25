@@ -1,4 +1,16 @@
 # CitySprinters
+```
+Dette er et gruppeprosjekt for faget "Systemutvikling" ved UiT, der 7 gruppemedlemmer deltok i dette prosjektet. Alt arbeid rundt dette prosjektet er utført av følgende studenter:
+
+Gruppemedlemmer
+Roar Harjo
+Eivind Nygård Haugen
+Sara Kristine Kildal Hverven
+Lill-Kristin Karlsen
+Ole Jakob Kvithyll
+Glenn Jøran Nilsen Skum
+Kristian Stenhaug
+```
 
 Følg denne veiledningen for å komme i gang
 
