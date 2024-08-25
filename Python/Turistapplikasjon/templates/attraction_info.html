@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script>
+    function toggleDescription() {
+        var content = document.getElementById("description");
+        if (content.classList.contains("collapse-description")) {
+            content.classList.remove("collapse-description");
+            document.getElementById("toggleButton").innerText = "See less";
+        } else {
+            content.classList.add("collapse-description");
+            document.getElementById("toggleButton").innerText = "See more";
+        }
+    }
+</script>
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h2>{{ info.name }}</h2>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">{{_('Practical Information')}}</h5>
+            <div id="description" class="collapse-description">
+                <p class="card-text">{{ info.practical_information.description }}</p>
+            </div>
+            <a href="javascript:void(0);" onclick="toggleDescription()" id="toggleButton">{{_('See more')}}</a><br><br>
+            <h6 class="card-subtitle mb-2 text-muted">{{_('Opening Hours')}}</h6>
+            <p class="card-text">{{ info.practical_information.opening_hours }}</p>
+            <h6 class="card-subtitle mb-2 text-muted">{{_('Entry Fee')}}</h6>
+            <p class="card-text">{{ info.practical_information.entry_fee }}</p>
+            <h6 class="card-subtitle mb-2 text-muted">Transportation</h6>
+            <p class="card-text">
+                <a href="{{ info.practical_information.nearest_public_transport_directions }}" target="_blank">{{_('Nearest Public Transport Directions')}}</a>
+            </p>
+            <h6 class="card-subtitle mb-2 text-muted">{{_('Location')}}</h6>
+            <p class="card-text">
+                <a href="{{ info.practical_information.google_maps_location }}" target="_blank">{{_('Google Maps Location')}}</a>
+            </p>
+            <h6 class="card-subtitle mb-2 text-muted">{{_('Official Website')}}</h6>
+            <p class="card-text">
+                <a href="{{ info.practical_information.official_website }}" target="_blank">{{ info.practical_information.official_website }}</a>
+            </p>
+            
+            <a href="{{ url_for('attractions.attractions') }}" class="btn btn-primary">{{_('Back to Attractions')}}</a>
+        </div>
+        <div class="card-footer text-muted">
+            {{_('Visit us for an unforgettable experience')}}.
+        </div>
+    </div>
+</div>
+{% endblock %}

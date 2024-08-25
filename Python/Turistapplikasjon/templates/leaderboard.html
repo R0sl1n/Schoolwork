@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if leaderboard %}
+<div class="container mt-4">
+    <h2>{{_('Leaderboard')}}</h2>
+    <div class="mt-4 row border border-dark rounded-5 p-3 bg-transparent shadow box-area input-container input-backdrop">
+        <table class="table-sm">
+            <thead>
+            <tr style="height:50px">
+                <th class="align-middle" scope="col">{{_('Ranking')}}</th>
+                <th class="align-middle" scope="col">{{_('Username')}}</th>
+                <th class="align-middle" scope="col">{{_('Points')}}</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for row in leaderboard %}
+                <tr>
+                    {% if row[0] <= 3 %}
+                    <td><img class="'img-fluid" src="{{ url_for('static', filename='img/high-score/placing_' ~ row[0] ~ '.png') }}" style='display: inline; height:50px;'></th>
+                    {% else %}
+                    <td style="height:50px">{{ row[0] }}</th>
+                    {% endif %}
+                    <td class="align-middle">{{ row[1] }}</td>
+                    <td class="align-middle">{{ row[2] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+    <p>{{_('No high score listings available')}}</p>
+{% endif %}
+
+{% endblock %}

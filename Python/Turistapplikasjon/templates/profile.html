@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block content %}
+<ul class="nav nav-tabs justify-content-center profile-tabs">
+    <li class="nav-item">
+        <a id="load-profile" class="nav-link active" href="#">{{_('Profile')}}</a>
+    </li>
+    <li class="nav-item">
+        <a id="load-achievements" class="nav-link" href="#">{{_('Achievements')}}</a>
+    </li>
+    <li class="nav-item">
+        <a id="load-rewards" class="nav-link" href="#">{{_('Rewards')}} ({{ user_rewards_count }})</a>
+    </li>
+</ul>
+<div id="profile-content">
+    <div class="container profile-container">
+        <div class="profile-header mb-5">
+            <a href="https://gravatar.com/"><img src="{{ user.gravatar(size=200) }}" class="rounded-circle user-avatar" alt="User Avatar"></a>
+            <h1 class="mt-4 username" style="color: white;">{{ user.username }}</h1>
+            <div class="user-points-display">
+                <span>Points: <strong>{{ user.points }}</strong></span>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6 mb-4">
+                <div class="card user-info bg-transparent shadow box-area input-backdrop">
+                    <div class="card-body">
+                        <h2 class="card-title">{{_('Personal Information')}}</h2>
+                        <p><strong>{{_('First name')}}:</strong> {{ user.first_name }}</p>
+                        <p><strong>{{_('Last name')}}:</strong> {{ user.last_name }}</p>
+                        <p><strong>{{_('Email')}}:</strong> {{ user.email }}</p>
+                    </div>
+                </div>
+                <div class="container profile-container">
+                    <div class="col-12">
+                        <div class="card visited-attractions bg-transparent shadow box-area input-backdrop">
+                            <div class="card-body">
+                                <h2 class="card-title">Visited attractions</h2>
+                                {% if user_has_visited_attractions %}
+                                    <ul>
+                                        {% for attraction in user_has_visited_attractions %}
+                                        <div>
+                                            <strong>{{ attraction[1] }}</strong> - Level Achieved: {{ attraction[2] }}
+                                        </div>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p>You haven't visited any attractions yet.</p>
+                                {% endif %}
+                            </div>
+
+                        </div>
+                    </div> 
+                </div>
+            </div>   
+        </div>        
+    </div>
+</div>
+
+
+<div id="rewards-container" style="display: none;">
+    <div class="container rewards-container">
+        <div class="card rewards bg-transparent shadow box-area input-backdrop">
+            <div class="card-body">
+                <h2 class="card-title">{{_('Your Rewards')}}</h2>
+                {% if rewards_info %}
+                <div class="row">
+                    {% for reward in rewards_info %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ reward[1] }}</h5>
+                                <p class="card-text">{{ reward[2] }}</p>
+                                <form method="POST" action="{{ url_for('profile.redeem_reward') }}">
+                                    {{ form.hidden_tag() }}
+                                    <input type="hidden" name="id" value="{{ reward[0] }}">
+                                    {{ form.submit(class="btn btn-primary") }}
+                                </form>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p2>{{_('No rewards yet')}}.</p2>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+<div id="achievements-container" style="display: none;">
+    <div class="container achievements-container">
+        <div class="card achievements bg-transparent shadow box-area input-backdrop">
+            <div class="card-body">
+                <h2 class="card-title">
+                    <img src="{{ url_for('static', filename='img/gold_crown.png') }}" class="achievement-icon" alt="Gold Crown"> Achievements <img src="{{ url_for('static', filename='img/gold_crown.png') }}" class="achievement-icon" alt="Gold Crown">
+                </h2>
+                {% if achievements %}
+                    {% for achievement in achievements %}
+                    <div class="achievement-entry mb-2">
+                        <h5><strong>{{ achievement['definition'] }}</strong></h5>
+                        <img src="{{ url_for('static', filename='img/achievements/' + achievement['icon']) }}" class="achievement-image rounded-circle" alt="{{ achievement['definition'] }} Icon">
+                        <p>Achieved on: <strong>{{ achievement['achieved_at'] }}</strong></p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No achievements yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#rewards-container').hide();
+        $('#achievements-container').hide();
+
+        $('.nav-link').click(function(e) {
+            if (this.id === 'load-profile' || this.id === 'load-rewards' || this.id === 'load-achievements') {
+                e.preventDefault();
+
+                $('#load-profile, #load-rewards, #load-achievements').removeClass('active');
+                
+                $(this).addClass('active');
+
+                $('#profile-content, #rewards-container, #achievements-container').hide();
+
+                if (this.id === 'load-profile') {
+                    $('#profile-content').show();
+                } else if (this.id === 'load-rewards') {
+                    $('#rewards-container').show();
+                } else if (this.id === 'load-achievements') {
+                    $('#achievements-container').show();
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

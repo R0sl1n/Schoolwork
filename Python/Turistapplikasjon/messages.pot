@@ -1,0 +1,45 @@
+
+msgid ""
+msgstr ""
+
+msgid "Hello"
+msgstr ""
+
+msgid "We are glad to have you back."
+msgstr ""
+
+msgid "Forgot Password?"
+msgstr ""
+
+msgid "Login"
+msgstr ""
+
+msgid "Home"
+msgstr ""
+
+msgid "Register"
+msgstr ""
+
+msgid "Register"
+msgstr ""
+
+msgid "About"
+msgstr ""
+
+msgid "Language"
+msgstr ""
+
+msgid "Logout"
+msgstr ""
+
+msgid "Profile"
+msgstr ""
+
+msgid "Friends"
+msgstr ""
+
+msgid "Admin Dashboard"
+msgstr ""
+
+msgid "Attractions"
+msgstr ""

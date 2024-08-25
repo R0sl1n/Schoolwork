@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="row border rounded-5 border-dark p-3 bg-transparent shadow box-area input-backdrop">
+        <div class="intro-text">
+            <h2>Admin Panel - Create User</h2>
+            <p>Create a new user account here.</p>
+        </div>
+
+        <div class="col">
+            <form action="{{ url_for('admin.create_user_from_admin_view') }}" method="post">
+                {{ form.hidden_tag() }}
+                <div class="input-group mb-2">
+                    {{form.username(class="form-control form-control-lg fs-6")}}
+                </div>
+
+                <div class="input-group mb-2">
+                    {{form.first_name(class="form-control form-control-lg fs-6")}}
+                </div>
+
+                <div class="input-group mb-2">
+                    {{form.last_name(class="form-control form-control-lg fs-6")}}
+                </div>
+
+                <div class="input-group mb-2">
+                    {{form.email(class="form-control form-control-lg fs-6")}}
+                </div>
+
+                <div class="input-group mb-2">
+                    {{form.password(class="form-control form-control-lg fs-6")}}
+                </div>
+
+                <div class="input-group mb-2">
+                    {{form.confirm_password(class="form-control form-control-lg fs-6")}}
+                </div>
+
+                <div class="input-group mb-2">
+                    {{ form.agree_to_terms() }}
+                    {{ form.agree_to_terms.label }}
+                    {% if form.agree_to_terms.errors %}
+                        {% for error in form.agree_to_terms.errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                
+
+            
+
+                <div class="input group col-1">
+                    <button class="btn btn-lg bg-white">
+                        Submit
+                    </button>
+                </div>
+            </form>
+
+            {% for message in get_flashed_messages(category_filter=["error", "success"]) %}
+                <div class="alert alert-{{ 'success' if 'successful' in message else 'danger' }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+  
+{% endblock %}

@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form id="cityForm" method="POST" >
+    <div class="input-group rounded search-container">
+      <select class="form-control rounded" name="selected_city" onchange="this.form.submit()">
+        <option disabled>{{_('Select City')}}</option>
+        {% for city in cities %}
+          {% if city['id'] == selected_city %}
+            <option value="{{city['id']}}" selected>{{ city['name'] }}</option>
+          {% else %}
+          <option value="{{city['id']}}" {% if city['id'] == selected_city %}selected{% endif %}>{{city['name']}}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    </div>
+</form>
+
+<!-- Filter and search -->
+<div class="checkbox-container">
+    <div class="checkbox-filter-btn" >
+        <span class="filter-btn-text" >{{_('Filter')}}</span>
+        <span class="filter-btn-icon"><i class="fa-solid fa-chevron-down"></i> </span>
+    </div>
+    <div class="checkbox-form">
+    <form action="{{url_for('attractions.attractions')}}" method="post" id="form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <span class="filters-description-text">{{_('Attractions')}}</span>
+    <ul class="checkbox-categories">
+        {% for category in categories %}
+        <li class="checkbox-category">
+        <input class="larger-textbox" type="checkbox" name="attractions" value="{{category[0]}}"><span class="checkbox-text">{{category[1]}}<i class="{{category[2]}} filter-icon"></i></span>
+        </li>
+        {% endfor %}
+        <hr class="solid">
+        <span class="filters-description-text">{{_('Services')}}</span>
+        {% for service in services %}
+        <li class="checkbox-category">
+        <input class="larger-textbox" type="checkbox" name="services" value="{{service[0]}}"><span class="checkbox-text">{{service[1]}}<i class="{{service[2]}} filter-icon"></i></span>
+        </li>
+        {% endfor %}
+    </ul>
+    <div class="checkbox-apply-btn">
+        <button class="btn btn-primary form-btn" type="submit"><span class="filter-apply-btn-text">{{_('Apply')}}</span></button>
+    </div>
+    
+    </form>
+    </div>
+    </div>
+    <div class="input-group rounded search-container">
+        <input type="search" class="form-control search rounded" placeholder="Search"/>
+    </div>
+
+<!-- Flash messages -->
+<div class="container mt-4">
+    {% for message in get_flashed_messages(category_filter=["error", "quiz_response", 'lives_update']) %}
+    <div class="alert alert-{{ 'success' if 'added' in message else 'danger' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
+
+<!-- Hud for lives-->
+<div class="container-fluid opacity-75" style="position: fixed; bottom: 0px; left: 0px; z-index:999; width: auto;">
+    <div id="lives-hud" class="card border border border-dark border-3 mb-2 " style="max-width: 16.0rem;">
+        <img id="lives-hearts" class="img-fluid m-2" src="{{ url_for('static', filename='img/lives/lives_' ~ lives ~ '.png') }}" alt="Remaining lives: {{ lives }}">
+        <button id="lives-button-hide" onclick="myFunction()">{{_('Hide')}}</button>
+    </div>
+</div>
+
+<!-- Script for showing/hiding hud -->
+<script>
+    function myFunction() {
+      var hearts = document.getElementById("lives-hearts");
+      var toggleButton = document.getElementById("lives-button-hide");
+      var livesHud = document.getElementById("lives-hud");
+      if (hearts.style.display === "none") {
+        hearts.style.display = "block";
+        toggleButton.innerHTML = "Hide"
+        livesHud.style.width = "16.0rem"
+      } else {
+        hearts.style.display = "none";
+        toggleButton.innerHTML = "{{_('Show')}}"
+        livesHud.style.width = "4.0rem"
+      }
+    }
+</script>
+
+<!-- Attractions -->
+<div class="container mt-4">
+    <h2>Attractions</h2>
+    <div class="row w-100 p-0 w-0">
+        {% if attractions|length > 0 %}
+        {% for attraction in attractions %}
+        <div class="col-lg-4 mb-2 card-container" data-string="{{ attraction['name'] }}">
+            <div class="card">
+                <img class="card-img-top img-thumbnail" src="{{ url_for('static', filename='img/attraction-images/Attraction_' ~ attraction['id'] ~ '.jpg') }}" alt="{{ attraction['name'] }}">
+                <h3 class="card-title">{{ attraction['name'] }}</h5>
+                <p class="card-text">{{ attraction['short_description'] }}</p>
+                <div class="card-body">
+                    <a href="{{ url_for('quiz.take_quiz', attraction_id=attraction.id) }}" class="btn btn-primary mt-2">Take Quiz</a>
+                    <a href="{{ url_for('attractions.attraction_info', attraction_id=attraction['id']) }}" class="btn btn-secondary mt-2">Read More</a>
+
+
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted"> {{_('Level')}} {{ attraction['level'] }}</small>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else%}
+        <span class="no-attraction-text" >{{_('We apologize but there is no attractions with those filter options at this moment')}}</span>
+        {% endif %}
+    </div>
+</div>
+
+
+<!-- Script for filter -->
+<script>
+    const checkboxBtn = document.querySelector(".checkbox-filter-btn")
+    const formBtn = document.querySelector(".form-btn")
+
+
+    // used to expand or contract checkbox.
+    checkboxBtn.addEventListener("click",() =>{
+        checkboxBtn.classList.toggle("open");
+    })
+    // Used to keep track of which checkboxes is selected after submit filter form.
+    formBtn.addEventListener("click",(e) =>{
+        e.preventDefault()
+        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+        let checkedValues = [];
+
+        checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            checkedValues.push(checkbox.value);
+        }
+        });
+        // Stores which checkboxes are selected in localstorage
+        localStorage.setItem('checkedValues', JSON.stringify(checkedValues));
+        document.getElementById("form").submit()
+        
+
+        })
+    // on page load sets checkedboxes to checked if user have clicked.
+    window.addEventListener("load",() =>{
+        const checkedValues = JSON.parse(localStorage.getItem('checkedValues'));
+
+        if (checkedValues) {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                if (checkedValues.includes(checkbox.value)) {
+                    checkbox.checked = true;
+                }
+                localStorage.clear()
+            });
+        }
+
+    })
+
+    const seachField = document.querySelector(".search");
+    const cards = document.querySelectorAll(".card-container");
+
+    seachField.addEventListener("keyup",() =>{
+        var input = seachField.value.toUpperCase();
+        cards.forEach(card =>{
+
+            if(card.getAttribute("data-string").toUpperCase().indexOf(input) < 0 ){
+                card.style.display = "none";
+            }
+            else{
+                card.style.display = "block";
+            }
+        })
+
+    });
+  
+
+</script>
+{% endblock %}

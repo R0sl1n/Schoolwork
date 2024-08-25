@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Flash messages -->
+    {% for message in get_flashed_messages(category_filter=["error", "success"]) %}
+    <div class="alert alert-{{ 'success' if 'added' in message else 'danger' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+    </div>
+    {% endfor %}
+
+    <!-- JavaScript to remove flash messages after 5 sec -->
+    <script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', (event) => {
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    if (alert.style.opacity === '0') {
+                        alert.parentNode.removeChild(alert);
+                    }
+                }, 500);
+            });
+        }, 5000);
+    });
+    </script>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-transparent shadow box-area input-backdrop">
+                <div class="card-body" style="color: white;">
+                    <h2 class="card-title text-center">Friend List</h2>
+                    <form method="POST" action="{{ url_for('profile.add_friend') }}" class="mb-4 text-center">
+                        {{ form_add_friend.hidden_tag() }}
+                        <div class="form-group mb-2">
+                            <label for="friend_email" style="color: white;">{{ form_add_friend.friend_email.label.text }}</label>
+                            {{ form_add_friend.friend_email(class='form-control') }}
+                        </div>
+                        {{ form_add_friend.submit_add(class='btn btn-primary') }}
+                    </form>
+                    {% if friends|length > 0 %}
+                        <div class="list-group">
+                        {% for friend in friends %}
+                            <div class="list-group-item bg-transparent" style="background-color: rgba(255, 255, 255, 0.1); border: none; border-radius: 15px; margin-bottom: 20px; padding: 25px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px);">
+                                <div style="color: white; margin-bottom: 20px;">
+                                    <h5>Username: <span style="font-weight: normal;">{{ friend.username }}</span></h5>
+                                    <p>E-mail: <span style="font-weight: normal;">{{ friend.email }}</span></p>
+                                    <small>Total Points: <span style="font-weight: normal;">{{ friend.points }}</small>
+                                </div>
+                                <div class="text-center">
+                                    <form method="POST" action="{{ url_for('profile.delete_friend', friend_id=friend.id) }}">
+                                        {{ form_delete_friend.hidden_tag() }}
+                                        <button type="submit" class="btn btn-danger btn-sm" style="width: 100px;">{{_('Remove')}}</button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center" style="color: white; font-size: 18px;">{{_('No friends added')}}.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

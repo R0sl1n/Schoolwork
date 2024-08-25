@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="row border rounded-5 border-dark p-3 bg-transparent shadow box-area input-backdrop">
+        <div class="intro-text">
+            <h2>Welcome to CitySprinter</h2>
+            <p>{{_('Create your account here')}}</p>
+        </div>
+
+        <div class="col">
+            <form action="{{ url_for('login_reg.signup') }}" method="post">
+                {{ form.hidden_tag() }}
+                <div class="input-group mb-2" >
+                    {{form.username(class="form-control form-control-lg fs-6")}}
+                </div>
+
+                <div class="input-group mb-2">
+                    {{form.first_name(class="form-control form-control-lg fs-6")}}
+                </div>
+
+                <div class="input-group mb-2">
+                    {{form.last_name(class="form-control form-control-lg fs-6")}}
+                </div>
+
+                <div class="input-group mb-2">
+                    {{form.email(class="form-control form-control-lg fs-6")}}
+                </div>
+
+                <div class="input-group mb-2">
+                    {{form.password(class="form-control form-control-lg fs-6")}}
+                </div>
+
+                <div class="input-group mb-2">
+                    {{form.confirm_password(class="form-control form-control-lg fs-6")}}
+                </div>
+
+                <div class="input-group mb-2">
+                    {{ form.agree_to_terms(class="form-check-input") }}
+                    <label style="margin-left: 5px; cursor: pointer;" onclick="showPrivacyPolicy()">{{_('I agree to the')}} <u>{{_('privacy policy')}}</u></label>
+                </div>
+
+                <div class="input-group mb-2 hidden" id="privacyPolicyInfo" >
+                    <label >...Add the privacy policy information here...</label> 
+                </div>
+
+                <div class="input group col-1" >
+                    <button class="btn btn-lg bg-white">
+                        {{_('Submit')}}
+                    </button>
+                </div>
+            </form>
+
+            <script>
+                /*
+                var container = document.querySelector('.box-area');
+                var initialWidth = container.offsetWidth;
+
+                function showPrivacyPolicy() {
+                    var privacyPolicyInfo = document.getElementById("privacyPolicyInfo");
+
+                    privacyPolicyInfo.classList.toggle("hidden");
+                    privacyPolicyInfo.classList.toggle("visible");
+
+                    container.style.width = privacyPolicyInfo.classList.contains('hidden') ? 'auto' : initialWidth + 'px';
+                } */
+
+                function showPrivacyPolicy(){
+                    window.open("{{url_for('miscellaneous.privacy_policy')}}","_blank")
+                }
+            </script>
+
+            <div>
+                {% for message in get_flashed_messages(category_filter=["error", "success"]) %}
+        <div class="alert alert-{{ 'success' if 'successful' in message else 'danger' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+
+
+        </div>
+
+
+    </div>
+
+
+
+</div>
+  
+{% endblock %}
+

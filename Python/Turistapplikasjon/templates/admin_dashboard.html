@@ -1,0 +1,772 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Admin Dashboard</h2>
+        <!-- Flash messages -->
+        {% for message in get_flashed_messages(category_filter=["error", "success"]) %}
+        <div class="alert alert-{{ 'success' if 'successful' in message else 'danger' }} alert-dismissible fade show" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    <div class="row border border-dark rounded-5 p-3 bg-transparent shadow box-area input-container input-backdrop">
+
+        <div class="col-md-12 rounded-5">
+            <h3>User Management</h3>
+            <a href="{{ url_for('admin.create_user_from_admin_view') }}" class="btn btn-primary btn-sm py-0 px-2">Create New User</a>
+            <div class="table-container" style="overflow-x: auto;">
+            <table class="table-responsive" style="overflow: visible;">
+                <table class="table mt-3 table-striped table-hover table-bordered" id="user-table">
+                    <thead class="thead-dark rounded">
+                        <tr>
+                            <th scope="col" class="py-0">Username</th>
+                            <th scope="col" class="py-0">First Name</th>
+                            <th scope="col" class="py-0">Last Name</th>
+                            <th scope="col" class="py-0">Email</th>
+                            <th scope="col" class="py-0">Verified</th>
+                            <th scope="col" class="py-0">Admin</th>
+                            <th scope="col" class="py-0">Blocked</th>
+                            <th scope="col" class="py-0">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr class="{{ 'table-success' if user[5] and user[6] else 'table-warning' if user[5] else '' }}">
+                            <td class="py-0">{{ user[1] }}</td> 
+                            <td class="py-0">{{ user[2] }}</td> 
+                            <td class="py-0">{{ user[3] }}</td> 
+                            <td class="py-0">{{ user[4] }}</td> 
+                            <td class="py-0">{{ "Yes" if user[5] else "No" }}</td> 
+                            <td class="py-0">{{ "Yes" if user[6] else "No" }}</td>
+                            <td class="py-0">{{ "Yes" if user[7] else "No" }}</td>
+                            
+                            <td class="d-flex align-items-center justify-content-start">
+                                <a href="{{url_for('admin.edit_user',user_id = user[0])}}" class="btn btn-info btn-sm px-2 py-0">Edit</a>
+                                <form action="{{ url_for('admin.delete_user', user_id=user[0]) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user?')">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-danger btn-sm px-2 py-0">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+            </table>
+        </div>
+
+            
+        </div>
+
+ 
+    </div>
+    <div class="row mt-3">
+    </div>
+    <!-----City Management-->
+    <div class="row border border-dark rounded-5 p-3 bg-transparent shadow box-area input-container input-backdrop">
+        <div class="col-md-12 justify-content-center align-items-center">
+            <h3>City Management</h3>
+ 
+            <button type="button" onclick="addCity()" class="btn btn-primary add-city-btn">Add City</button>
+            <div class="city-table-container table-responsive" style="overflow-x: auto;">
+            <table class="table mt-3 table-striped table-hover table-bordered table-filters" id="filter-table">
+                <thead class="thead-dark rounded">
+                    <tr>
+                        <th scope="col" class="py-0">Name</th>
+                        <th scope="col" class="py-0">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for city in cities %}
+                    <tr>
+                        <td class="py-0">{{ city['name'] }}</td>
+                        <td class="d-flex align-items-center justify-content-start">
+                            <form action="{{url_for('admin.remove_city',city_id=city['id'])}}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this city?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-danger btn-sm px-2 py-0">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+</div>
+
+
+<!---Add City Start-->
+<div class="add-city-form-container d-none">
+    <form action="{{ url_for('admin.add_city') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <label for="name">City Name:</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" onclick="cityCancel('add-city-form-container')" class="btn btn-primary">Cancel</button>
+    </form>  
+</div>
+
+<!----Add City End-->
+
+
+</div>
+<!----City Management End-->
+
+    <div class="row mt-3">
+    </div>
+    <div class="row border border-dark rounded-5 p-3 bg-transparent shadow box-area input-container input-backdrop">
+    <div class="col-md-12 justify-content-center align-items-center">
+        <h3>Attraction Management</h3>
+        <button type="button" onclick="addAttraction()" class="btn btn-primary add-attraction-btn">Add Attraction</button>
+                </div>
+                
+            
+        <!-- List Existing Attractions -->
+        <div class="attraction-table-container" style="overflow-x: auto;">
+        <table class="table mt-3 table-striped table-hover table-bordered" id="attraction-table">
+            <thead class="thead-dark rounded">
+                <tr>
+                    <th scope="col" class="py-0">City</th>
+                    <th scope="col" class="py-0">Name</th>
+                    <th scope="col" class="py-0">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attraction in attractions %}
+                <tr>
+                    <td class="py-0">{{ attraction['city_name'] }}</td>
+                    <td class="py-0">{{ attraction['name'] }}</td>
+                    <td class="d-flex align-items-center justify-content-start">
+                        <form action="{{ url_for('admin.remove_attraction', attraction_id=attraction['id']) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this attraction?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-danger btn-sm px-2 py-0">Delete</button>
+                        </form>
+                        {% set id = attraction['id'] %}
+                        <button type="button" onclick="editAttraction('{{id}}')" class="btn btn-success btn-sm px-2 py-0">Edit</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="add-attraction-form-container d-none">
+        <form action="{{ url_for('admin.add_attraction') }}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="name">Attraction Name:</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+
+            <div class="input-group mt-3">
+                <select class="form-select" name="city" id="city">
+                  <option selected>Choose a city</option>
+                  {% for city in cities %}
+                  <option value="{{city['id']}}" >{{city['name']}}</option>
+                {% endfor %}
+                </select>
+              </div>
+
+            <div class="form-group">
+                <label for="short_description">Short Description:</label>
+                <textarea class="form-control" id="short_description" name="short_description" rows="2" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="long_description">Long Description:</label>
+                <textarea class="form-control" id="long_description" name="long_description" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="opening_hours">Opening Hours:</label>
+                <textarea class="form-control" id="opening_hours" name="opening_hours" rows="2" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="entry_fee">Entry fee:</label>
+                <textarea class="form-control" id="entry_fee" name="entry_fee" rows="2" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="public_transport_map">Nearest public transportation map link:</label>
+                <input type="url" class="form-control" id="public_transport_map" name="public_transport_map" required>
+            </div>
+            <div class="form-group">
+                <label for="attraction_map">Attraction map link:</label>
+                <input type="url" class="form-control" id="attraction_map" name="attraction_map" required>
+            </div>
+            <div class="form-group">
+                <label for="site_link">Official website link:</label>
+                <input type="url" class="form-control" id="site_link" name="site_link" required>
+            </div>
+            <div class="form-group">
+                <label for="image_file">Image:</label>
+                <input type="file" class="form-control" id="image_file" name="image_file" accept="image/jpeg" required>
+            </div>
+
+            <div class="container mt-5 bg-light">
+                <div class="row">
+                    <div class="col-6">
+                        <ul class="checkbox-categories">
+                            <span class="filters-description-text">{{_('Attraction Type')}}:</span>
+                        {% for category in categories %}
+                        {% if category['type'] == 'Attraction' %}
+                        <li class="checkbox-category">
+                            <input class="larger-textbox" type="checkbox" name="attractions" value="{{category['id']}}"><span class="checkbox-text">{{category['definition']}}<i class="{{category['icon']}} filter-icon"></i></span>
+                            </li>
+
+                        {% endif %}
+
+                        {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-6">
+                        <ul class="checkbox-categories">
+                            <span class="filters-description-text">{{_('Service Type')}}:</span>
+                            {% for category in categories %}
+                            {% if category['type'] == 'Services' %}
+                            <li class="checkbox-category">
+                                <input class="larger-textbox" type="checkbox" name="services" value="{{category['id']}}"><span class="checkbox-text">{{category['definition']}}<i class="{{category['icon']}} filter-icon"></i></span>
+                                </li>
+    
+                            {% endif %}
+    
+                            {% endfor %}
+                            </ul>
+                        
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" onclick="attractionCancel('add-attraction-form-container')" class="btn btn-primary">Cancel</button>
+        </form>  
+    </div>
+
+    <div class="edit-attraction-form-container d-none">
+        <form method="POST" enctype="multipart/form-data" id="editAttractionForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="name">Attraction Name:</label>
+                <input type="text" class="form-control" id="editname" name="name" required>
+            </div>
+           <!---<div class="form-group">
+                <label for="city_name">City:</label>
+                <input type="text" class="form-control" id="editcity_name" name="city_name" required>
+            </div> -->
+
+            <div class="input-group mt-3">
+                <select class="form-select" name="city" id="editcity">
+                  <option selected>Choose a city</option>
+                  {% for city in cities %}
+                  <option value="{{city['id']}}" >{{city['name']}}</option>
+                {% endfor %}
+                </select>
+              </div>
+              
+
+            <div class="form-group">
+                <label for="short_description">Short Description:</label>
+                <textarea class="form-control" id="editshort_description" name="short_description" rows="2" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="long_description">Long Description:</label>
+                <textarea class="form-control" id="editlong_description" name="long_description" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="opening_hours">Opening Hours:</label>
+                <textarea class="form-control" id="editopening_hours" name="opening_hours" rows="2" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="entry_fee">Entry fee:</label>
+                <textarea class="form-control" id="editentry_fee" name="entry_fee" rows="2" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="public_transport_map">Nearest public transportation map link:</label>
+                <input type="url" class="form-control" id="editpublic_transport_map" name="public_transport_map" required>
+            </div>
+            <div class="form-group">
+                <label for="attraction_map">Attraction map link:</label>
+                <input type="url" class="form-control" id="editattraction_map" name="attraction_map" required>
+            </div>
+            <div class="form-group">
+                <label for="site_link">Official website link:</label>
+                <input type="url" class="form-control" id="editsite_link" name="site_link" required>
+            </div>
+            <div class="form-group">
+                <label for="image_file">Image:<small>leave blank to keep old image</small></label>
+                <input type="file" class="form-control" id="image_file" name="image_file" accept="image/jpeg">
+            </div>
+
+            <div class="container mt-5 bg-light">
+                <div class="row">
+                    <div class="col-6">
+                        <ul class="checkbox-categories">
+                            <span class="filters-description-text">{{_('Attraction Type')}}:</span>
+                        {% for category in categories %}
+                        {% if category['type'] == 'Attraction' %}
+                        <li class="checkbox-category">
+                            <input class="larger-textbox" type="checkbox" name="attractions" value="{{category['id']}}"><span class="checkbox-text">{{category['definition']}}<i class="{{category['icon']}} filter-icon"></i></span>
+                            </li>
+
+                        {% endif %}
+
+                        {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-6">
+                        <ul class="checkbox-categories">
+                            <span class="filters-description-text">{{_('Service Type')}}:</span>
+                            {% for category in categories %}
+                            {% if category['type'] == 'Services' %}
+                            <li class="checkbox-category">
+                                <input class="larger-textbox" type="checkbox" name="services" value="{{category['id']}}"><span class="checkbox-text">{{category['definition']}}<i class="{{category['icon']}} filter-icon"></i></span>
+                                </li>
+    
+                            {% endif %}
+    
+                            {% endfor %}
+                            </ul>
+                        
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" onclick="attractionCancel('edit-attraction-form-container')" class="btn btn-primary">Cancel</button>
+        </form>
+
+    </div>
+    </div>
+    <div class="row mt-3">
+    </div>
+
+    <div class="row border border-dark rounded-5 p-3 bg-transparent shadow box-area input-container input-backdrop">
+        <div class="col-md-12 justify-content-center align-items-center">
+            <h3>Reward Management</h3>
+            <form action="{{ url_for('admin.upload_reward') }}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group">
+                    <label for="reward_file">Upload Reward:</label>
+                    <input type="file" class="form-control" id="reward_file" name="reward_file" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload Reward</button>
+            </form>
+        </div>
+    </div>
+    <div class="row mt-3">
+    </div>
+    <!-- Filter Management start -->
+    <div class="row border border-dark rounded-5 p-3 bg-transparent shadow box-area input-container input-backdrop">
+        <div class="col-md-12 justify-content-center align-items-center">
+            <h3>Filter Management</h3>
+            <button type="button" onclick="addFilters()" class="btn btn-primary add-filter-btn">Add Filter</button>
+            <div class="filter-table-container table-responsive" style="overflow-x: auto;">
+            <table class="table mt-3 table-striped table-hover table-bordered table-filters" id="filter-table">
+                <thead class="thead-dark rounded">
+                    <tr>
+                        <th scope="col" class="py-0">Name</th>
+                        <th scope="col" class="py-0">Type</th>
+                        <th scope="col" class="py-0">Icon</th>
+                        <th scope="col" class="py-0">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                    <tr>
+                        <td class="py-0">{{ category['definition'] }}</td>
+                        <td class="py-0">{{ category['type'] }}</td>
+                        <td class="py-0">{{ category['icon'] }}</td>
+                        <td class="d-flex align-items-center justify-content-start">
+                            <form action="{{url_for('admin.remove_filter',category_id=category['id'])}}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this category?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-danger btn-sm px-2 py-0">Delete</button>
+                            </form>
+                            {% set id = category['id'] %}
+                            {% set name = category['definition'] %}
+                            {% set type = category['type'] %}
+                            {% set icon = category['icon'] %}
+                            
+                                <button type="button" onclick="editFilter('{{id}}','{{name}}','{{type}}','{{icon}}')" class="btn btn-success btn-sm px-2 py-0">Edit</button>
+                               
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        
+            <div class="filter-form-container" style="display: none;">
+            <form action="{{url_for('admin.add_filter')}}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group">
+                    <label for="name">Category:</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <ul class="admin-filter-list">
+                    <li>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="categorytype" id="Attraction" value="1">
+                                <label class="form-check-label" for="attraction">
+                                    Attraction
+                                </label>
+                        </div>
+                    </li>
+                    <li>
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="categorytype" id="Services" value="2">
+                    <label class="form-check-label" for="Services">
+                      Services
+                    </label>
+                  </div>
+                </li>
+                </ul>
+                  <div class="form-group">
+                    <label for="icon1">Icon:</label>
+                    <small>Font Awsome icon text</small>
+                    <input type="text" class="form-control" id="icon" name="icon" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="button" onclick="filterCancel('filter-form-container')" class="btn btn-primary">Cancel</button>
+            </form>
+
+            </div>
+
+    <div class="filter-edit-form-container" style="display: none;">
+        <form action="{{url_for('admin.edit_filter')}}" method="POST" class="edit-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="nameEdit">Category:</label>
+                <input type="text" class="form-control" id="nameEdit" name="name" required>
+            </div>
+            <ul class="admin-filter-list">
+            <li><div class="form-check">
+                <input class="form-check-input" type="radio" name="categorytype" id="EditAttraction" value="1">
+                <label class="form-check-label" for="attraction">
+                  Attraction
+                </label>
+              </div>
+            </li>
+            <li>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="categorytype" id="EditServices" value="2">
+                <label class="form-check-label" for="Services">
+                  Services
+                </label>
+              </div>
+            </li>
+            </ul>
+              <div class="form-group">
+                <label for="iconEdit">Icon:</label>
+                <small>Font Awesome icon text</small>
+                <small>Leave empty for default</small>
+                <input type="text" class="form-control" id="iconEdit" name="icon">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" onclick="filterCancel('filter-edit-form-container')" class="btn btn-primary">Cancel</button>
+        </form>
+
+</div>
+</div>
+    </div>
+<!-- Filter Management end -->
+
+<div class="row mt-3">
+</div>
+
+
+<!-- Quiz Management Start -->
+<div class="row border border-dark rounded-5 p-3 bg-transparent shadow box-area input-container input-backdrop">
+    <div class="col-md-12 justify-content-center align-items-center">
+        <h3>Quiz Management</h3>
+        <button type="button" onclick="addQuestion()" class="btn btn-primary add-question-btn">Add Question</button>
+        <div class="question-table-container table-responsive" style="overflow-x: auto;">
+        <table class="table mt-3 table-striped table-hover table-bordered table-questions" id="question-table">
+            <thead class="thead-dark rounded">
+                <tr>
+                    <th scope="col" class="py-0">Attraction</th>
+                    <th scope="col" class="py-0">Level</th>
+                    <th scope="col" class="py-0">Question Text</th>
+                    <th scope="col" class="py-0">Option 1</th>
+                    <th scope="col" class="py-0">Option 2</th>
+                    <th scope="col" class="py-0">Option 3</th>
+                    <th scope="col" class="py-0">Option 4</th>
+                    <th scope="col" class="py-0">Answer</th>
+                    <th scope="col" class="py-0">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for question in quiz_questions %}
+                <tr>
+                    <td class="py-0">{{ question['attraction'] }}</td>
+                    <td class="py-0">{{ question['level'] }}</td>
+                    <td class="py-0">{{ question['question_text'] }}</td>
+                    <td class="py-0">{{ question['option_2'] }}</td>
+                    <td class="py-0">{{ question['option_3'] }}</td>
+                    <td class="py-0">{{ question['option_4'] }}</td>
+                    <td class="py-0">{{ question['option_5'] }}</td>
+                    <td class="py-0">{{ question['correct_answer'] }}</td>
+                    <td class="d-flex align-items-center justify-content-start">
+                        <form action="{{url_for('admin.remove_question',question_id=question['id'])}}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this question?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-danger btn-sm px-2 py-0">Delete</button>
+                        </form>
+                        {% set id = question['id'] %}
+                        {% set attraction_id = question['attraction_id'] %}
+                        {% set level = question['level'] %}
+                        {% set question_text = question['question_text'] %}
+                        {% set option_1 = question['option_2'] %}
+                        {% set option_2 = question['option_3'] %}
+                        {% set option_3 = question['option_4'] %}
+                        {% set option_4 = question['option_5'] %}
+                        {% set answer = question['correct_answer'] %}
+                        
+                            <button type="button" onclick="editQuestion('{{id}}','{{level}}','{{attraction_id}}',
+                            '{{question_text}}','{{option_1}}','{{option_2}}','{{option_3}}','{{option_4}}','{{answer}}')" class="btn btn-success btn-sm px-2 py-0">Edit</button>
+                           
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+    <!---Add question-->
+    <div class="question-form-container d-none">
+        <form action="{{url_for('admin.add_question')}}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group">
+                <label for="attractions">Choose a attraction:</label>
+                <select name="attraction" id="attraction">
+                {% for attraction in attractions %}
+                  <option value="{{attraction['id']}}">{{attraction['name']}}</option>
+                {% endfor %}
+            </select> 
+            </div>
+              <div class="form-group">
+                <label for="level">level (between 1 and 5):</label>
+                <input type="number" id="level" name="level" min="1" max="5" required style="width: 50px;">
+            </div>
+    
+            <div class="form-group">
+                <label for="question_text">Question Text:</label>
+                <input type="text" class="form-control" id="question_text" name="question_text" required maxlength="200">
+                <label for="answer1">Answer 1:</label>
+                <input type="text" class="form-control" id="answer1" name="answer_1" required maxlength="200">
+                <label for="answer2">Answer 2:</label>
+                <input type="text" class="form-control" id="answer2" name="answer_2" required maxlength="200">
+                <label for="answer3">Answer 3:</label>
+                <input type="text" class="form-control" id="answer3" name="answer_3" required maxlength="200">
+                <label for="answer4">Answer 4:</label>
+                <input type="text" class="form-control" id="answer4" name="answer_4" required maxlength="200">
+                <label for="correct-answer">Correct answer:</label>
+                <input type="text" class="form-control" id="correct-answer" name="correct_answer" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" onclick="questionCancel('question-form-container')" class="btn btn-primary">Cancel</button>
+        </form>
+        </div>
+
+        <!---Edit question-->
+        <div class="edit-question-form-container d-none">
+            <form action="{{url_for('admin.edit_question')}}" method="POST" class="edit-question-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group">
+                    <label for="attractions">Choose a attraction:</label>
+                    <select name="attraction" id="editattraction">
+                    {% for attraction in attractions %}
+                      <option value="{{attraction['id']}}" >{{attraction['name']}}</option>
+                    {% endfor %}
+                </select> 
+                </div>
+                  <div class="form-group">
+                    <label for="level">level (between 1 and 5):</label>
+                    <input type="number" id="editlevel" name="level" min="1" max="5" required style="width: 50px;">
+                </div>
+        
+                <div class="form-group">
+                    <label for="question_text">Question Text:</label>
+                    <input type="text" class="form-control" id="editquestion_text" name="question_text" required maxlength="200">
+                    <label for="answer1">Answer 1:</label>
+                    <input type="text" class="form-control" id="editanswer1" name="answer_1" required maxlength="200">
+                    <label for="answer2">Answer 2:</label>
+                    <input type="text" class="form-control" id="editanswer2" name="answer_2" required maxlength="200">
+                    <label for="answer3">Answer 3:</label>
+                    <input type="text" class="form-control" id="editanswer3" name="answer_3" required maxlength="200">
+                    <label for="answer4">Answer 4:</label>
+                    <input type="text" class="form-control" id="editanswer4" name="answer_4" required maxlength="200">
+                    <label for="correct-answer">Correct answer:</label>
+                    <input type="text" class="form-control" id="editcorrect-answer" name="correct_answer" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="button" onclick="questionCancel('question-form-container')" class="btn btn-primary">Cancel</button>
+            </form>
+        
+            </div>
+
+</div>
+
+
+
+
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+                        setTimeout(function() {
+                            var alerts = document.querySelectorAll('.alert');
+                            alerts.forEach(function(alert) {
+                                alert.style.opacity = '0';
+                                setTimeout(function() {
+                                    if (alert.style.opacity === '0') {
+                                        alert.parentNode.removeChild(alert);
+                                    }
+                                }, 500);
+                            });
+                        }, 5000);
+                    });
+        function addCity(){
+            document.querySelector(".add-city-form-container").classList.remove("d-none")
+            document.querySelector(".add-city-btn").classList.add("d-none")
+            document.querySelector(".city-table-container").classList.add("d-none")
+        }
+
+        function cityCancel(container){
+            document.querySelector(".city-table-container").classList.remove("d-none")
+            document.querySelector("."+container).classList.add("d-none")
+            document.querySelector(".add-city-btn").classList.remove("d-none")
+        }
+
+
+        function addAttraction(){
+            document.querySelector(".attraction-table-container").classList.add("d-none")
+            document.querySelector(".add-attraction-form-container").classList.remove("d-none")
+            document.querySelector(".add-attraction-btn").classList.add("d-none")
+    
+        }
+
+        function attractionCancel(container){
+            document.querySelector(".attraction-table-container").classList.remove("d-none")
+            document.querySelector("."+container).classList.add("d-none")
+            document.querySelector(".add-attraction-btn").classList.remove("d-none")
+        }
+
+        function editAttraction(id){
+            const view = "/admin/dashboard/edit_attraction/"+id
+            fetch(view).then(response => response.json())
+            .then(data =>{
+            document.getElementById("editname").value = data["name"]
+            document.getElementById("editshort_description").value = data['short_description']
+            document.getElementById("editlong_description").value = data['practical_information']['description']
+            document.getElementById("editopening_hours").value = data['practical_information']['opening_hours']
+            document.getElementById("editpublic_transport_map").value = data['practical_information']['nearest_public_transport_directions']
+            document.getElementById("editentry_fee").value = data['practical_information']['entry_fee']
+            document.getElementById("editattraction_map").value = data['practical_information']['google_maps_location']
+            document.getElementById("editsite_link").value = data['practical_information']['official_website']
+            document.getElementById("editlevel").value = data['level']
+            const selectedCity = document.getElementById("editcity")
+
+
+            const isCheckedList = data['categories']
+            const editFormContainer = document.querySelector(".edit-attraction-form-container")
+            const checkBoxes = editFormContainer.querySelectorAll('input[type="checkbox"]')
+
+            
+            for(var i, j = 0; i = selectedCity.options[j]; j++) {
+
+                if(i.value == data['city_id']) {
+                    selectedCity.selectedIndex = j;
+                    break;
+                }
+                }
+
+            checkBoxes.forEach(checkbox => {
+
+                if (isCheckedList.includes(checkbox.value)) {
+                    checkbox.checked = true;
+                }
+            });
+
+            editFormContainer.classList.remove("d-none")
+            document.querySelector(".attraction-table-container").classList.add("d-none")
+            document.querySelector(".add-attraction-btn").classList.add("d-none")
+            document.getElementById("editAttractionForm").action = "/admin/dashboard/edit_attraction/"+id
+        }
+        )            
+        }
+
+        function addFilters(){
+            const filterTable = document.querySelector(".filter-table-container")
+            const filterFormContainer = document.querySelector(".filter-form-container")
+            document.querySelector(".add-filter-btn").classList.add("d-none")
+            filterTable.classList.add("d-none")
+            filterFormContainer.classList.add("d-block")
+
+        }
+
+        function filterCancel(container){
+            const filterTable = document.querySelector(".filter-table-container")
+            const filterFormContainer = document.querySelector("."+container)
+            document.querySelector(".add-filter-btn").classList.remove("d-none")
+            filterTable.classList.remove("d-none")
+            filterFormContainer.classList.remove("d-block")
+
+        }
+
+
+        function editFilter(id,category,type,icon){
+            const form = document.querySelector(".edit-form");
+            document.querySelector(".add-filter-btn").classList.add("d-none");
+            document.querySelector(".filter-table-container").classList.add("d-none");
+            document.querySelector(".filter-edit-form-container").classList.add("d-block");
+            document.getElementById("nameEdit").value = category;
+            document.getElementById('Edit'+type).checked = "checked";
+            document.getElementById("iconEdit").value = icon;
+
+            var input = document.createElement("input");
+            input.setAttribute("type", "hidden");
+            input.setAttribute("name", "category_id");
+            input.setAttribute("value", id);
+            form.appendChild(input)
+        }
+
+        function addQuestion(){
+            document.querySelector(".question-table-container").classList.add("d-none")
+            document.querySelector(".question-form-container").classList.remove("d-none")
+            document.querySelector(".add-question-btn").classList.add("d-none")
+        }
+
+        function questionCancel(container){
+            document.querySelector(".question-table-container").classList.remove("d-none")
+            document.querySelector("."+container).classList.add("d-none")
+            document.querySelector(".add-question-btn").classList.remove("d-none")
+        }
+
+        function editQuestion(id,level,attraction_id,question_text,option_1,option_2,option_3,option_4,answer){
+            const form = document.querySelector(".edit-question-form")
+            document.querySelector(".question-table-container").classList.add("d-none")
+            document.querySelector(".add-question-btn").classList.add("d-none")
+            document.querySelector(".edit-question-form-container").classList.remove("d-none")
+            var attraction = document.getElementById("editattraction")
+
+            document.getElementById("editlevel").value = level;
+            document.getElementById("editquestion_text").value = question_text;
+            document.getElementById("editanswer1").value = option_1;
+            document.getElementById("editanswer2").value = option_2;
+            document.getElementById("editanswer3").value = option_3;
+            document.getElementById("editanswer4").value = option_4;
+            document.getElementById("editcorrect-answer").value = answer;
+
+            for(var i, j = 0; i = attraction.options[j]; j++) {
+                console.log(attraction_id)
+                if(i.value == attraction_id) {
+                    attraction.selectedIndex = j;
+                    break;
+                }
+                }
+
+            var input = document.createElement("input");
+            input.setAttribute("type", "hidden");
+            input.setAttribute("name", "question_id");
+            input.setAttribute("value", id);
+            form.appendChild(input)
+
+
+        }
+    </script>
+{% endblock %}
