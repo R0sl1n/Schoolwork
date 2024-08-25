@@ -1,6 +1,7 @@
 """
 School assignment where we were collecting data from over 100 teachers regarding the use of adaptive learning tools in math education in middleschool.
-Code written by Lill-Kristin Karlsen i Oct/Nov 2023.
+
+Code was written for the purpose of visualization of, and extracting data from, the surveyresults. Written by Lill-Kristin Karlsen i Oct/Nov 2023.
 Undervisningsmetoder_nyeste.xlsx is the dataset used, and available for download in the same folder as this code.
 Some of the values are hardcoded for simplicity.
 """
