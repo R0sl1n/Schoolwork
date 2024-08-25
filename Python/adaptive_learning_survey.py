@@ -1,6 +1,8 @@
 """
-School assignment where we were collecting data from over 100 teatcher regarding the use of adaptive learning tools in math education in middleschool.
-Written by Lill-Kristin Karlsen i Oct/Nov 2023.
+School assignment where we were collecting data from over 100 teachers regarding the use of adaptive learning tools in math education in middleschool.
+Code written by Lill-Kristin Karlsen i Oct/Nov 2023.
+Undervisningsmetoder_nyeste.xlsx is the dataset used, and available for download in the same folder as this code.
+Some of the values are hardcoded for simplicity.
 """
 import pandas as pd
 import seaborn as sns
@@ -66,7 +68,7 @@ categories = [
 
 # Splitting multiple choice questions.
 for col in df.columns:
-    if df[col].dtype == 'O':  # Check if column data type is 'object' (usually string in pandas)
+    if df[col].dtype == 'O': 
         df[col] = df[col].str.rstrip(';')
 
 # Filter dataframe to only include given columns.
