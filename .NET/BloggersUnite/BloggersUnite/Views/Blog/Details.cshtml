@@ -1,0 +1,56 @@
+﻿@inject UserManager<IdentityUser> UserManager
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model BloggersUnite.Models.Blog
+
+<h2>@Model.Title</h2>
+<p>@Model.Description</p>
+
+<h3>Posts</h3>
+
+@if (Model.Posts != null && Model.Posts.Any())
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Content</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var post in Model.Posts)
+        {
+            <tr>
+                <td>@post.Title</td>
+                <td>@post.Content</td>
+                <td>
+                    <a asp-action="Details" asp-controller="Post" asp-route-id="@post.Id">View Post</a>
+
+                    @if (UserManager.GetUserId(User) == post.OwnerId)
+                    {
+                        <a asp-action="Edit" asp-controller="Post" asp-route-id="@post.Id" class="btn btn-secondary">Edit</a>
+                        <a asp-action="Delete" asp-controller="Post" asp-route-id="@post.Id" class="btn btn-danger">Delete</a>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No posts available in this blog.</p>
+}
+
+@if (Model.AllowPosts) 
+{
+    @if (UserManager.GetUserId(User) == Model.OwnerId)
+    {
+        <a asp-action="Create" asp-controller="Post" asp-route-blogId="@Model.Id" class="btn btn-primary">Add Post</a>
+    }
+}
+else
+{
+    <p>New posts are disabled for this blog.</p>
+}

@@ -1,0 +1,32 @@
+﻿@model IEnumerable<BloggersUnite.Models.Blog>
+
+<h2>Search Results</h2>
+
+@if (Model.Any())
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var blog in Model)
+        {
+            <tr>
+                <td>@blog.Title</td>
+                <td>@blog.Description</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@blog.Id" class="btn btn-primary">View Blog</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No blogs matched your search query.</p>
+}

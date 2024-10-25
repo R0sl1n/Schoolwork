@@ -1,0 +1,57 @@
+﻿@inject UserManager<IdentityUser> UserManager
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model BloggersUnite.Models.Post
+
+<h2>@Model.Title</h2>
+<p>@Model.Content</p>
+
+@if (UserManager.GetUserId(User) == Model.OwnerId)
+{
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+}
+
+<h3>Comments</h3>
+
+@if (Model.Blog != null && Model.Blog.IsOpen)
+{
+    @if (Model.Comments != null && Model.Comments.Any())
+    {
+        <ul class="list-group">
+            @foreach (var comment in Model.Comments)
+            {
+                <li class="list-group-item">
+                    <p>@comment.Content</p>
+                    <small>Written by @(comment.Owner?.Email ?? "Unknown user") on @comment.CreatedOn</small>
+                    @if (UserManager.GetUserId(User) == comment.OwnerId)
+                    {
+                        <a asp-action="Edit" asp-controller="Comment" asp-route-id="@comment.Id" class="btn btn-secondary">Edit</a>
+                        <a asp-action="Delete" asp-controller="Comment" asp-route-id="@comment.Id" class="btn btn-danger">Delete</a>
+                    }
+                </li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No comments yet.</p>
+    }
+
+    <h4>Add a Comment</h4>
+    <form asp-action="CreateComment" asp-controller="Post" method="post">
+        <input type="hidden" name="postId" value="@Model.Id" />
+        <div class="form-group">
+            <textarea name="content" class="form-control" rows="4" placeholder="Write your comment here..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Comment</button>
+    </form>
+}
+else if (Model.Blog != null && !Model.Blog.IsOpen)
+{
+    <p>Comments are disabled for this blog.</p>
+}
+else
+{
+    <p>Error: Blog details not loaded.</p>
+}

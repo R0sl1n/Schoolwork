@@ -1,0 +1,27 @@
+﻿@model IEnumerable<BloggersUnite.Models.Post>
+
+<h2>Posts</h2>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Title</th>
+        <th>Content</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var post in Model)
+    {
+        <tr>
+            <td>@post.Title</td>
+            <td>@post.Content</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@post.Id">View</a> |
+                <a asp-action="Edit" asp-route-id="@post.Id">Edit</a> |
+                <a asp-action="Delete" asp-route-id="@post.Id">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+<a asp-action="Create" class="btn btn-primary">Create New Post</a>

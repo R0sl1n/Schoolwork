@@ -1,0 +1,30 @@
+﻿@model BloggersUnite.Models.Blog
+
+<h2>Create Blog</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="Title"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Description"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <!-- Use 'Allow Comments' for the IsOpen field, hiding the database field name -->
+        <input asp-for="IsOpen" type="checkbox" /> Allow comments
+    </div>
+    <div class="form-group">
+        <!-- Use 'Allow Posts' for the AllowPosts field, hiding the database field name -->
+        <input asp-for="AllowPosts" type="checkbox" /> Allow new posts
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

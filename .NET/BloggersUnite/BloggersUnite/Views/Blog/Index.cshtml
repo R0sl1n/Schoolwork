@@ -1,0 +1,34 @@
+﻿@inject UserManager<IdentityUser> UserManager
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model IEnumerable<BloggersUnite.Models.Blog>
+
+<h2>Blogs</h2>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var blog in Model)
+    {
+        <tr>
+            <td>@blog.Title</td>
+            <td>@blog.Description</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@blog.Id">View</a>
+                @if (UserManager.GetUserId(User) == blog.OwnerId)
+                {
+                    <a asp-action="Edit" asp-route-id="@blog.Id" class="btn btn-secondary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@blog.Id" class="btn btn-danger">Delete</a>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<a asp-action="Create" class="btn btn-primary">Create New Blog</a>
