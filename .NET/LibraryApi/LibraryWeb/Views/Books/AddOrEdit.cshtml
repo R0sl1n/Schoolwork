@@ -1,0 +1,102 @@
+﻿@{
+    ViewData["Title"] = "Add or Edit Book";
+    var bookId = ViewBag.BookId;
+}
+
+<div class="container">
+    <h1>@(bookId == null ? "Add New Book" : "Edit Book")</h1>
+    <form id="book-form">
+        <input type="hidden" id="book-id" value="@bookId" />
+
+        <div class="form-group">
+            <label>Title:</label>
+            <input type="text" id="title" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label>Author First Name:</label>
+            <input type="text" id="author-firstname" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label>Author Last Name:</label>
+            <input type="text" id="author-lastname" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label>Category:</label>
+            <input type="text" id="category" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label>Year:</label>
+            <input type="number" id="year" class="form-control" required />
+        </div>
+
+        <div class="form-group">
+            <label>Description:</label>
+            <textarea id="description" class="form-control" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var bookId = $('#book-id').val();
+
+        // Hent bokdetaljer hvis bookId eksisterer
+        if (bookId) {
+            $.ajax({
+                url: `https://localhost:7204/api/Books/${bookId}`,
+                method: "GET",
+                success: function (data) {
+                    $('#title').val(data.title);
+                    var authorName = data.authorName.split(' ');
+                    $('#author-firstname').val(authorName[0]);
+                    $('#author-lastname').val(authorName[1]);
+                    $('#category').val(data.categoryName);
+                    $('#year').val(data.year);
+                    $('#description').val(data.description);
+                },
+                error: function () {
+                    alert('Failed to load book details.');
+                }
+            });
+        }
+
+        $('#book-form').submit(function (event) {
+            event.preventDefault();
+
+            var bookData = {
+                id: bookId ? parseInt(bookId) : 0, // Legg til ID hvis det er en eksisterende bok
+                title: $('#title').val(),
+                authorName: $('#author-firstname').val() + ' ' + $('#author-lastname').val(),
+                categoryName: $('#category').val(),
+                year: parseInt($('#year').val()),
+                description: $('#description').val()
+            };
+
+            var method = bookId ? 'PUT' : 'POST';
+            var url = bookId ? `https://localhost:7204/api/Books/${bookId}` : 'https://localhost:7204/api/Books';
+
+            $.ajax({
+                url: url,
+                method: method,
+                contentType: "application/json",
+                data: JSON.stringify(bookData),
+                success: function () {
+                    alert('Book saved successfully.');
+                    window.location.href = '/Books/Index';
+                },
+                error: function (xhr) {
+                    var errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'An unknown error occurred.';
+                    alert(`Failed to save book: ${errorMessage}`);
+                }
+            });
+        });
+    });
+</script>
+

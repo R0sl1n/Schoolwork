@@ -1,0 +1,56 @@
+﻿.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+button {
+    padding: 5px 10px;
+    margin: 5px;
+}
+
+.message {
+    margin-bottom: 20px;
+    color: green;
+}
+
+    .message.error {
+        color: red;
+    }
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    margin: auto;
+}
+
+    form input, form textarea {
+        margin-bottom: 10px;
+        padding: 8px;
+    }
+
+    form button {
+        width: 100px;
+        margin-top: 10px;
+    }

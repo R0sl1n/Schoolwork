@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Library Books</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Library Books</h1>
+    <ul id="book-list"></ul>
+
+    <script>
+        $(document).ready(function() {
+            $.ajax({
+                url: "https://localhost:7204/api/books",
+                method: "GET",
+                success: function(data) {
+                    data.forEach(function(book) {
+                        $('#book-list').append('<li>' + book.title + ' by ' + book.author.firstName + ' ' + book.author.lastName + '</li>');
+                    });
+                },
+                error: function() {
+                    alert('Failed to retrieve books');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
