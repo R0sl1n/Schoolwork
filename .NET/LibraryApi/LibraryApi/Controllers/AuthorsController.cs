@@ -5,7 +5,7 @@ using LibraryApi.Models;
 
 namespace LibraryApi.Controllers
 {
-    // API Controller for managing authors456
+    // API Controller for managing authors
     [Route("api/[controller]")]
     [ApiController]
     public class AuthorsController : ControllerBase

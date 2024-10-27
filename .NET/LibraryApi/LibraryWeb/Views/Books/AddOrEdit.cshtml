@@ -47,7 +47,7 @@
     $(document).ready(function () {
         var bookId = $('#book-id').val();
 
-        // Hent bokdetaljer hvis bookId eksisterer
+        // Get bookdetails if bookid exists.
         if (bookId) {
             $.ajax({
                 url: `https://localhost:7204/api/Books/${bookId}`,
@@ -71,7 +71,7 @@
             event.preventDefault();
 
             var bookData = {
-                id: bookId ? parseInt(bookId) : 0, // Legg til ID hvis det er en eksisterende bok
+                id: bookId ? parseInt(bookId) : 0, // Add ID if existing book
                 title: $('#title').val(),
                 authorName: $('#author-firstname').val() + ' ' + $('#author-lastname').val(),
                 categoryName: $('#category').val(),

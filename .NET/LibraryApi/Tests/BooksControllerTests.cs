@@ -300,56 +300,58 @@ namespace Tests
         [Fact]
         public async Task PostBook_CreatesNewCategory_WhenCategoryDoesNotExist()
         {
-            // Arrange
+            // Arrange: Set up a new book DTO with a category name that does not currently exist
             var newBookDto = new BookDto
             {
                 Title = "New Category Book",
                 Year = 2023,
                 AuthorName = "Author Name",
-                CategoryName = "New Unique Category" // Kategori som ikke finnes fra før
+                CategoryName = "New Unique Category" // A category that doesn't already exist
             };
 
-            // Act
+            // Act: Call the controller's PostBook method with the new book DTO
             var result = await _controller.PostBook(newBookDto);
 
-            // Assert
+            // Assert: Verify that a new category is created
             var createdResult = result.Result as CreatedAtActionResult;
-            Assert.NotNull(createdResult);
+            Assert.NotNull(createdResult); // Ensure the result is not null and of the expected type
             var createdBook = createdResult?.Value as Book;
-            Assert.NotNull(createdBook);
-            Assert.Equal("New Unique Category", createdBook?.Category?.Name);
+            Assert.NotNull(createdBook); // Ensure the created book is not null
+            Assert.Equal("New Unique Category", createdBook?.Category?.Name); // Check if the category name matches the new unique category
         }
 
         [Fact]
         public async Task PutBook_UpdatesBook_WhenAuthorIsChanged()
         {
-            // Arrange
+            // Arrange: Set up a book DTO with a new author name
             var bookDto = new BookDto
             {
                 Id = 1,
                 Title = "Book With New Author",
                 Year = 2022,
-                AuthorName = "New Author Name", // Ny forfatter
+                AuthorName = "New Author Name", // New author name
                 CategoryName = "Fiction"
             };
 
+            // Add an initial book with the same ID but a different (old) author name
             await _bookService.AddBookAsync(new BookDto
             {
                 Id = 1,
                 Title = "Book With New Author",
                 Year = 2022,
-                AuthorName = "Old Author Name", // Gammel forfatter
+                AuthorName = "Old Author Name", // Old author name
                 CategoryName = "Fiction"
             });
 
-            // Act
+            // Act: Call the controller's PutBook method to update the author of the book
             var result = await _controller.PutBook(1, bookDto);
 
-            // Assert
+            // Assert: Verify that the update was successful and returned a NoContent (204) status code
             var noContentResult = result as NoContentResult;
-            Assert.NotNull(noContentResult);
-            Assert.Equal(204, noContentResult!.StatusCode);
+            Assert.NotNull(noContentResult); // Ensure the result is not null and of the expected type
+            Assert.Equal(204, noContentResult!.StatusCode); // Verify that the status code is 204 (No Content)
         }
+
 
     }
 }

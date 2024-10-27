@@ -52,7 +52,7 @@ namespace LibraryApi.Services
         // Adds a new category to the database
         public async Task<Category> AddCategoryAsync(Category category)
         {
-            // Sjekk om kategorien allerede eksisterer ved å konvertere navnene til små bokstaver
+            // Check if exists and convert to lower case
             var existingCategory = await _context.Categories
                 .FirstOrDefaultAsync(c => c.Name.ToLower() == category.Name.ToLower());
 
@@ -61,7 +61,7 @@ namespace LibraryApi.Services
                 throw new InvalidOperationException("A category with the same name already exists.");
             }
 
-            // Legg til den nye kategorien hvis ingen eksisterende kategori ble funnet
+            // Add if no existing category was found
             _context.Categories.Add(category);
             await _context.SaveChangesAsync();
             return category;
