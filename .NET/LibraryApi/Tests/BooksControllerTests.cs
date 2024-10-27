@@ -1,10 +1,11 @@
-﻿
-using LibraryApi.Controllers;
+﻿using LibraryApi.Controllers;
 using LibraryApi.Services;
 using LibraryApi.Models;
 using LibraryApi.Dtos;
 using Microsoft.AspNetCore.Mvc;
-
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace Tests
 {
@@ -21,7 +22,6 @@ namespace Tests
         }
 
         [Fact]
-        // Test to verify that GetBooks returns a list of books with status OK
         public async Task GetBooks_ReturnsOkResult_WithListOfBooks()
         {
             var result = await _controller.GetBooks();
@@ -34,7 +34,6 @@ namespace Tests
         }
 
         [Fact]
-        // Test to verify that GetBook returns NotFound when a book with the specified ID does not exist
         public async Task GetBook_ReturnsNotFound_WhenBookDoesNotExist()
         {
             var result = await _controller.GetBook(999);
@@ -42,7 +41,6 @@ namespace Tests
         }
 
         [Fact]
-        // Test to verify that PostBook adds a new book successfully
         public async Task PostBook_AddsBookSuccessfully()
         {
             var newBookDto = new BookDto { Title = "New Book", Year = 2021, AuthorName = "Test Author", CategoryName = "Test Category" };
@@ -55,7 +53,6 @@ namespace Tests
         }
 
         [Fact]
-        // Test to verify that DeleteBook returns NotFound when attempting to delete a non-existent book
         public async Task DeleteBook_ReturnsNotFound_WhenBookDoesNotExist()
         {
             var result = await _controller.DeleteBook(999);
@@ -63,7 +60,6 @@ namespace Tests
         }
 
         [Fact]
-        // Test to verify that PutBook returns BadRequest when the IDs do not match
         public async Task PutBook_ReturnsBadRequest_WhenIdsDoNotMatch()
         {
             var bookDto = new BookDto { Id = 2, Title = "Updated Title" };
@@ -72,51 +68,37 @@ namespace Tests
         }
 
         [Fact]
-        // Test to verify that GetBooks returns an empty list when no books exist
         public async Task GetBooks_ReturnsEmptyList_WhenNoBooksExist()
         {
-            // Act
             var result = await _controller.GetBooks();
-
-            // Assert
             var okResult = result.Result as OkObjectResult;
             Assert.NotNull(okResult);
-
             var books = okResult?.Value as IEnumerable<BookDto>;
             Assert.NotNull(books);
             Assert.Empty(books);
         }
 
         [Fact]
-        // Test to verify that DeleteBook returns NoContent when deleting an existing book
         public async Task DeleteBook_ReturnsNoContent_WhenBookExists()
         {
-            // Arrange
             var bookDto = new BookDto { Id = 1, Title = "Existing Book", AuthorName = "Test Author", Year = 2022 };
-            var book = new Book { Id = 1, Title = "Existing Book", AuthorId = 1, Year = 2022 };
             await _bookService.AddBookAsync(bookDto);
 
-            // Act
             var result = await _controller.DeleteBook(1);
-
-            // Assert
             var noContentResult = result as NoContentResult;
             Assert.NotNull(noContentResult);
             Assert.Equal(204, noContentResult!.StatusCode);
         }
 
         [Fact]
-        // Test to verify that PutBook returns NotFound when updating a non-existent book
         public async Task UpdateBook_ReturnsNotFound_WhenBookDoesNotExist()
         {
             var bookDto = new BookDto { Id = 999, Title = "Nonexistent Book" };
             var result = await _controller.PutBook(999, bookDto);
-
             Assert.IsType<NotFoundObjectResult>(result);
         }
 
         [Fact]
-        // Test to verify that GetBookByDetails returns NotFound when the details do not match any book
         public async Task GetBookByDetails_ReturnsNotFound_WhenDetailsDoNotMatch()
         {
             var result = await _controller.GetBookByDetails("Nonexistent Title", 999, 1999);
@@ -125,7 +107,6 @@ namespace Tests
         }
 
         [Fact]
-        // Test to verify that PostBook returns BadRequest when invalid data is provided
         public async Task PostBook_ReturnsBadRequest_WhenInvalidData()
         {
             var invalidBookDto = new BookDto { Title = "", Year = -1, AuthorName = "", CategoryName = "" };
@@ -136,82 +117,56 @@ namespace Tests
         }
 
         [Fact]
-        // Test to verify that PutBook returns NoContent when a book is updated successfully
         public async Task PutBook_ReturnsNoContent_WhenUpdateIsSuccessful()
         {
-            // Arrange
             var bookDto = new BookDto { Id = 1, Title = "Updated Book", Year = 2022, AuthorName = "Test Author", CategoryName = "Test Category" };
             await _bookService.AddBookAsync(bookDto);
 
-            // Act
             var result = await _controller.PutBook(1, bookDto);
-
-            // Assert
-            if (result is NoContentResult noContentResult)
-            {
-                Assert.Equal(204, noContentResult.StatusCode);
-            }
-            else
-            {
-                Assert.True(false, "Expected NoContentResult but got a different result.");
-            }
+            Assert.NotNull(result);
+            Assert.IsType<NoContentResult>(result);
         }
 
         [Fact]
-        // Test to verify that PostBook returns Conflict when a book with the same details already exists
         public async Task PostBook_ReturnsConflict_WhenBookAlreadyExists()
         {
-            // Arrange
             var existingBookDto = new BookDto { Id = 1, Title = "Existing Book", Year = 2022, AuthorName = "Test Author", CategoryName = "Test Category" };
             await _bookService.AddBookAsync(existingBookDto);
 
             var newBookDto = new BookDto { Id = 2, Title = "Existing Book", Year = 2022, AuthorName = "Test Author", CategoryName = "Test Category" };
-
-            // Act
             var result = await _controller.PostBook(newBookDto);
 
-            // Assert
             var conflictResult = result.Result as ConflictObjectResult;
             Assert.NotNull(conflictResult);
             Assert.Equal(409, conflictResult!.StatusCode);
         }
 
         [Fact]
-        // Test to verify that GetBookByDetails returns the correct book when details match
         public async Task GetBookByDetails_ReturnsCorrectBook_WhenDetailsMatch()
         {
-            // Arrange
             var bookDto = new BookDto { Id = 1, Title = "Unique Title", Year = 2023, AuthorName = "Specific Author", CategoryName = "Fiction" };
             await _bookService.AddBookAsync(bookDto);
 
-            // Act
             var result = await _controller.GetBookByDetails("Unique Title", 1, 2023);
-
-            // Assert
             var okResult = result.Result as OkObjectResult;
             Assert.NotNull(okResult);
-
             var foundBook = okResult?.Value as Book;
             Assert.NotNull(foundBook);
             Assert.Equal("Unique Title", foundBook?.Title);
         }
 
         [Fact]
-        // Test to verify that GetBooks returns the correct number of books when multiple books exist
         public async Task GetBooks_ReturnsCorrectNumberOfBooks_WhenMultipleBooksExist()
         {
-            // Arrange
             var book1 = new BookDto { Id = 1, Title = "First Book", Year = 2021, AuthorName = "Author One", CategoryName = "Category One" };
             var book2 = new BookDto { Id = 2, Title = "Second Book", Year = 2022, AuthorName = "Author Two", CategoryName = "Category Two" };
 
             await _bookService.AddBookAsync(book1);
             await _bookService.AddBookAsync(book2);
 
-            // Act
             var result = await _controller.GetBooks();
             var okResult = result.Result as OkObjectResult;
 
-            // Assert
             Assert.NotNull(okResult);
             var books = okResult?.Value as IEnumerable<BookDto>;
             Assert.NotNull(books);
@@ -219,18 +174,14 @@ namespace Tests
         }
 
         [Fact]
-        // Test to verify that GetBook returns the correct book when it exists
         public async Task GetBook_ReturnsCorrectBook_WhenBookExists()
         {
-            // Arrange
             var bookDto = new BookDto { Id = 1, Title = "Specific Book", Year = 2021, AuthorName = "Test Author", CategoryName = "Test Category" };
             await _bookService.AddBookAsync(bookDto);
 
-            // Act
             var result = await _controller.GetBook(1);
             var okResult = result.Result as OkObjectResult;
 
-            // Assert
             Assert.NotNull(okResult);
             var returnedBook = okResult?.Value as BookDto;
             Assert.NotNull(returnedBook);
@@ -241,99 +192,121 @@ namespace Tests
         }
 
         [Fact]
-        // Test to verify that PostBook allows duplicate titles and years with different authors
-        public async Task PostBook_AllowsDuplicateTitleAndYear_WithDifferentAuthors()
+        // Test to verify that PostBook returns BadRequest when the author name is invalid
+        public async Task PostBook_ReturnsBadRequest_WhenAuthorNameIsInvalid()
         {
             // Arrange
-            var firstBookDto = new BookDto
+            var bookDto = new BookDto
             {
-                Id = 1,
-                Title = "Duplicate Title",
-                Year = 2023,
-                AuthorName = "First Author",
-                CategoryName = "Science"
-            };
-
-            var secondBookDto = new BookDto
-            {
-                Id = 2,
-                Title = "Duplicate Title",
-                Year = 2023,
-                AuthorName = "Second Author",
-                CategoryName = "Science"
+                Title = "Book Without Author",
+                Year = 2021,
+                AuthorName = "", // Invalid author name
+                CategoryName = "Test Category"
             };
 
             // Act
-            var firstResult = await _controller.PostBook(firstBookDto);
-            var secondResult = await _controller.PostBook(secondBookDto);
+            var result = await _controller.PostBook(bookDto);
 
             // Assert
-            var firstCreatedResult = firstResult.Result as CreatedAtActionResult;
-            var secondCreatedResult = secondResult.Result as CreatedAtActionResult;
-
-            Assert.NotNull(firstCreatedResult);
-            Assert.NotNull(secondCreatedResult);
-            Assert.Equal(201, firstCreatedResult!.StatusCode);
-            Assert.Equal(201, secondCreatedResult!.StatusCode);
+            var badRequestResult = result.Result as BadRequestObjectResult;
+            Assert.NotNull(badRequestResult);
+            Assert.Equal(400, badRequestResult!.StatusCode);
         }
 
         [Fact]
-        // Test to verify that PostBook returns CreatedResult when a valid book is provided
-        public async Task PostBook_ReturnsCreatedResult_WhenBookIsValid()
-        {
-            // Arrange
-            var validBookDto = new BookDto
-            {
-                Title = "Simple Book",
-                Year = 2023,
-                AuthorName = "Simple Author",
-                CategoryName = "Simple Category"
-            };
-
-            // Act
-            var result = await _controller.PostBook(validBookDto);
-
-            // Assert
-            var createdResult = result.Result as CreatedAtActionResult;
-            Assert.NotNull(createdResult);
-            Assert.Equal(201, createdResult!.StatusCode);
-        }
-
-        [Fact]
-        // Test to verify that PutBook returns NoContent when a book is updated successfully
-        public async Task PutBook_ReturnsNoContent_WhenBookIsUpdatedSuccessfully()
+        // Test to verify that GetBooks returns books with the correct category information
+        public async Task GetBooks_ReturnsBooks_WithCorrectCategoryInformation()
         {
             // Arrange
             var bookDto = new BookDto
             {
                 Id = 1,
-                Title = "Updated Title",
+                Title = "Categorized Book",
                 Year = 2023,
-                AuthorName = "Updated Author",
-                CategoryName = "Updated Category"
+                AuthorName = "Author Test",
+                CategoryName = "Science Fiction"
             };
-
             await _bookService.AddBookAsync(bookDto);
 
             // Act
-            var result = await _controller.PutBook(1, bookDto);
+            var result = await _controller.GetBooks();
+            var okResult = result.Result as OkObjectResult;
 
             // Assert
-            Assert.NotNull(result);
-            Assert.IsType<NoContentResult>(result);
+            Assert.NotNull(okResult);
+            var books = okResult?.Value as IEnumerable<BookDto>;
+            Assert.NotNull(books);
+            Assert.Single(books);
+            var book = books?.FirstOrDefault();
+            Assert.NotNull(book);
+            Assert.Equal("Science Fiction", book?.CategoryName);
         }
 
         [Fact]
-        // Test to verify that PostBook returns Created when a valid book is provided
-        public async Task PostBook_ReturnsCreated_WhenValidBookIsProvided()
+        // Test to verify that GetBookByDetails returns the correct book when author ID and title match but year does not
+        public async Task GetBookByDetails_ReturnsNotFound_WhenYearDoesNotMatch()
+        {
+            // Arrange
+            var bookDto = new BookDto
+            {
+                Id = 1,
+                Title = "Time Travel Book",
+                Year = 2025,
+                AuthorName = "Time Author",
+                CategoryName = "Science Fiction"
+            };
+            await _bookService.AddBookAsync(bookDto);
+
+            // Act
+            var result = await _controller.GetBookByDetails("Time Travel Book", 1, 2024); // Year mismatch
+            var notFoundResult = result.Result as NotFoundResult;
+
+            // Assert
+            Assert.NotNull(notFoundResult);
+        }
+
+        [Fact]
+        // Test to verify that PostBook returns Conflict when adding a duplicate book with the same title, author, and year
+        public async Task PostBook_ReturnsConflict_WhenDuplicateBookAdded()
+        {
+            // Arrange
+            var bookDto = new BookDto
+            {
+                Id = 1,
+                Title = "Duplicate Book",
+                Year = 2022,
+                AuthorName = "Author One",
+                CategoryName = "Fiction"
+            };
+            await _bookService.AddBookAsync(bookDto);
+
+            // Act
+            var duplicateBookDto = new BookDto
+            {
+                Id = 2,
+                Title = "Duplicate Book",
+                Year = 2022,
+                AuthorName = "Author One",
+                CategoryName = "Fiction"
+            };
+            var result = await _controller.PostBook(duplicateBookDto);
+
+            // Assert
+            var conflictResult = result.Result as ConflictObjectResult;
+            Assert.NotNull(conflictResult);
+            Assert.Equal(409, conflictResult!.StatusCode);
+        }
+
+        [Fact]
+        public async Task PostBook_CreatesNewCategory_WhenCategoryDoesNotExist()
         {
             // Arrange
             var newBookDto = new BookDto
             {
-                Title = "Valid Book",
+                Title = "New Category Book",
                 Year = 2023,
-                AuthorName = "Valid Author",
-                CategoryName = "Valid Category"
+                AuthorName = "Author Name",
+                CategoryName = "New Unique Category" // Kategori som ikke finnes fra før
             };
 
             // Act
@@ -342,7 +315,40 @@ namespace Tests
             // Assert
             var createdResult = result.Result as CreatedAtActionResult;
             Assert.NotNull(createdResult);
-            Assert.Equal(201, createdResult!.StatusCode);
+            var createdBook = createdResult?.Value as Book;
+            Assert.NotNull(createdBook);
+            Assert.Equal("New Unique Category", createdBook?.Category?.Name);
+        }
+
+        [Fact]
+        public async Task PutBook_UpdatesBook_WhenAuthorIsChanged()
+        {
+            // Arrange
+            var bookDto = new BookDto
+            {
+                Id = 1,
+                Title = "Book With New Author",
+                Year = 2022,
+                AuthorName = "New Author Name", // Ny forfatter
+                CategoryName = "Fiction"
+            };
+
+            await _bookService.AddBookAsync(new BookDto
+            {
+                Id = 1,
+                Title = "Book With New Author",
+                Year = 2022,
+                AuthorName = "Old Author Name", // Gammel forfatter
+                CategoryName = "Fiction"
+            });
+
+            // Act
+            var result = await _controller.PutBook(1, bookDto);
+
+            // Assert
+            var noContentResult = result as NoContentResult;
+            Assert.NotNull(noContentResult);
+            Assert.Equal(204, noContentResult!.StatusCode);
         }
 
     }

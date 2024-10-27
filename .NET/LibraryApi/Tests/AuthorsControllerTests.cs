@@ -112,5 +112,32 @@ namespace Tests
             Assert.NotNull(noContentResult);
             Assert.Equal(204, noContentResult!.StatusCode);
         }
+
+        [Fact]
+        // Test to verify that PostAuthor returns Conflict when an author with the same name already exists
+        public async Task PostAuthor_ReturnsConflict_WhenAuthorAlreadyExists()
+        {
+            var author = new Author { FirstName = "Duplicate", LastName = "Author" };
+            await _authorService.AddAuthorAsync(author);
+            var duplicateAuthor = new Author { FirstName = "Duplicate", LastName = "Author" };
+            var result = await _controller.PostAuthor(duplicateAuthor);
+            var conflictResult = result.Result as ConflictObjectResult;
+            Assert.NotNull(conflictResult);
+            Assert.Equal(409, conflictResult!.StatusCode);
+        }
+
+        [Fact]
+        // Test to verify that PutAuthor returns NoContent when updating an existing author
+        public async Task PutAuthor_ReturnsNoContent_WhenAuthorIsUpdated()
+        {
+            var author = new Author { Id = 1, FirstName = "Updated", LastName = "Author" };
+            await _authorService.AddAuthorAsync(author);
+            author.FirstName = "Changed";
+            var result = await _controller.PutAuthor(1, author);
+            var noContentResult = result as NoContentResult;
+            Assert.NotNull(noContentResult);
+            Assert.Equal(204, noContentResult!.StatusCode);
+        }
+
     }
 }

@@ -115,5 +115,57 @@ namespace Tests
             var notFoundResult = result.Result as NotFoundResult;
             Assert.NotNull(notFoundResult);
         }
+
+        [Fact]
+        // Test to verify that PostCategory returns Conflict when a category with the same name already exists
+        public async Task PostCategory_ReturnsConflict_WhenCategoryAlreadyExists()
+        {
+            // Arrange
+            var category = new Category { Name = "Duplicate Category" };
+            await _categoryService.AddCategoryAsync(category);
+
+            // Act
+            var duplicateCategory = new Category { Name = "Duplicate Category" };
+            var result = await _controller.PostCategory(duplicateCategory);
+
+            // Assert
+            var conflictResult = result.Result as ConflictObjectResult;
+            Assert.NotNull(conflictResult);
+            Assert.Equal(409, conflictResult!.StatusCode);
+        }
+
+        [Fact]
+        // Test to verify that PostCategory returns BadRequest when the model state is invalid
+        public async Task PostCategory_ReturnsBadRequest_WhenModelStateIsInvalid()
+        {
+            // Arrange
+            _controller.ModelState.AddModelError("Name", "Name is required");
+
+            // Act
+            var category = new Category(); // Missing required fields
+            var result = await _controller.PostCategory(category);
+
+            // Assert
+            var badRequestResult = result.Result as BadRequestObjectResult;
+            Assert.NotNull(badRequestResult);
+            Assert.Equal(400, badRequestResult!.StatusCode);
+        }
+
+        [Fact]
+        // Test to verify that DeleteCategory returns NoContent when the category is successfully deleted
+        public async Task DeleteCategory_ReturnsNoContent_WhenCategoryIsDeleted()
+        {
+            // Arrange
+            var category = new Category { Name = "Temporary Category" };
+            var addedCategory = await _categoryService.AddCategoryAsync(category);
+
+            // Act
+            var result = await _controller.DeleteCategory(addedCategory.Id);
+
+            // Assert
+            var noContentResult = result as NoContentResult;
+            Assert.NotNull(noContentResult);
+            Assert.Equal(204, noContentResult!.StatusCode);
+        }
     }
 }

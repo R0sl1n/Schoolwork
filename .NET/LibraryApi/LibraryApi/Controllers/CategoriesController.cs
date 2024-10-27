@@ -56,12 +56,25 @@ namespace LibraryApi.Controllers
         // POST: api/categories
         // Adds a new category
         [HttpPost]
-        public async Task<ActionResult<CategoryDto>> PostCategory(Category category)
+        public async Task<ActionResult<CategoryDto>> PostCategory([FromBody] Category category)
         {
-            var createdCategory = await _categoryService.AddCategoryAsync(category);
-            // Returns 201 Created with the location of the newly created category
-            return CreatedAtAction(nameof(GetCategory), new { id = createdCategory.Id }, createdCategory);
+            // Validate the model state
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var createdCategory = await _categoryService.AddCategoryAsync(category);
+                return CreatedAtAction(nameof(GetCategory), new { id = createdCategory.Id }, createdCategory);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
         }
+
 
         // PUT: api/categories/{id}
         // Updates an existing category by ID

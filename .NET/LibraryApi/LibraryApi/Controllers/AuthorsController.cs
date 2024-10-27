@@ -5,7 +5,7 @@ using LibraryApi.Models;
 
 namespace LibraryApi.Controllers
 {
-    // API Controller for managing authors
+    // API Controller for managing authors456
     [Route("api/[controller]")]
     [ApiController]
     public class AuthorsController : ControllerBase
@@ -52,10 +52,18 @@ namespace LibraryApi.Controllers
         [HttpPost]
         public async Task<ActionResult<AuthorDto>> PostAuthor(Author author)
         {
-            var createdAuthor = await _authorService.AddAuthorAsync(author);
-            // Returns 201 with the location of the newly created author
-            return CreatedAtAction(nameof(GetAuthor), new { id = createdAuthor.Id }, createdAuthor);
+            try
+            {
+                var createdAuthor = await _authorService.AddAuthorAsync(author);
+                // Returns 201 with the location of the newly created author
+                return CreatedAtAction(nameof(GetAuthor), new { id = createdAuthor.Id }, createdAuthor);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message }); // Returns 409 Conflict if the author already exists
+            }
         }
+
 
         // PUT: api/authors/{id}
         // Updates an existing author by ID

@@ -45,16 +45,28 @@ namespace LibraryApi.Services
         // Retrieves a category by its name
         public async Task<Category?> GetCategoryByNameAsync(string name)
         {
-            return await _context.Categories.FirstOrDefaultAsync(c => c.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            return await _context.Categories
+                .FirstOrDefaultAsync(c => c.Name.ToLower() == name.ToLower());
         }
 
         // Adds a new category to the database
         public async Task<Category> AddCategoryAsync(Category category)
         {
+            // Sjekk om kategorien allerede eksisterer ved å konvertere navnene til små bokstaver
+            var existingCategory = await _context.Categories
+                .FirstOrDefaultAsync(c => c.Name.ToLower() == category.Name.ToLower());
+
+            if (existingCategory != null)
+            {
+                throw new InvalidOperationException("A category with the same name already exists.");
+            }
+
+            // Legg til den nye kategorien hvis ingen eksisterende kategori ble funnet
             _context.Categories.Add(category);
             await _context.SaveChangesAsync();
             return category;
         }
+
 
         // Updates an existing category based on the provided data
         public async Task<bool> UpdateCategoryAsync(Category category)

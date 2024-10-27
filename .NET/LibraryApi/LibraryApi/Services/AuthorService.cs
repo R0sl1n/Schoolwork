@@ -50,13 +50,25 @@ namespace LibraryApi.Services
             return await _context.Authors.FirstOrDefaultAsync(a => a.FirstName == firstName && a.LastName == lastName);
         }
 
-        // Adds a new author to the database
+        // Adds a new author to the database, ensuring no duplicate authors exist
         public async Task<Author> AddAuthorAsync(Author author)
         {
+            // Check if an author with the same first and last name already exists (case-insensitive check)
+            var existingAuthor = await _context.Authors
+                .FirstOrDefaultAsync(a => a.FirstName.ToLower() == author.FirstName.ToLower() &&
+                                          a.LastName.ToLower() == author.LastName.ToLower());
+
+            if (existingAuthor != null)
+            {
+                throw new InvalidOperationException("An author with the same name already exists.");
+            }
+
+            // Add the new author if no existing author was found
             _context.Authors.Add(author);
             await _context.SaveChangesAsync();
             return author;
         }
+
 
         // Updates an existing author's information in the database
         public async Task<bool> UpdateAuthorAsync(Author author)
