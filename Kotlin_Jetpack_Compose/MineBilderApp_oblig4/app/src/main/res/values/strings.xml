@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Mine Bilder</string>
+    <string name="saved_pictures">Lagrede bilder</string>
+    <string name="dowloaded_pictures">Nedlastede bilder</string>
+    <string name="show">Vis</string>
+    <string name="save">Lagre</string>
+    <string name="delete">Slett</string>
+    <string name="picture_not_found">Bilde ikke funnet</string>
+    <string name="valgt_bilde">Valgt bilde</string>
+    <string name="go_back">Gå tilbake</string>
+    <string name="error_missing_or_invalid_photo_id">Manglende eller ugyldig bilde ID.</string>
+    <string name="photo_not_found">Bilde ikke funnet</string>
+    <string name="Id">Id</string>
+    <string name="title">Title</string>
+    <string name="Album_Id">Album Id</string>
+    <string name="album_title">Album Title</string>
+    <string name="failed_to_load_photos">Klarte ikke å laste inn bildene</string>
+    <string name="retry">Prøv på nytt</string>
+    <string name="loading">Laster</string>
+    <string name="loading_images_message">Laster inn bilder, vær tålmodig</string>
+    <string name="photo_percentage">%1$s%%</string>
+</resources>
